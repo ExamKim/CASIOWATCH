@@ -16,7 +16,6 @@ app.use("/products", productRoutes);
 
 
 
-
 const errorHandler = require("./middlewares/errorHandler");
 app.use(errorHandler);
 
