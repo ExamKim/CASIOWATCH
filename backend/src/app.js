@@ -15,6 +15,9 @@ const productRoutes = require("./routes/productRoutes");
 app.use("/products", productRoutes);
 
 
-app.listen(5000, () => {
-    console.log("Server running on port 5000");
-});
+
+
+const errorHandler = require("./middlewares/errorHandler");
+app.use(errorHandler);
+
+module.exports = app;
