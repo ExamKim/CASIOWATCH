@@ -1,0 +1,51 @@
+[
+    {
+        "id": 1,
+        "name": "G-Shock GA-2100",
+        "category": "gshock",
+        "gender": "men",
+        "price": 2500000,
+        "salePrice": 1990000,
+        "isSale": true,
+        "discount": 20,
+        "stock": 10,
+        "sold": 50,
+        "status": "active",
+        "rating": 4.5,
+        "reviewCount": 12,
+        "image": "/images/gshock-ga2100.png",
+        "description": "Thiết kế bền bỉ, phong cách thể thao."
+    },
+    {
+        "id": 2,
+        "name": "Edifice EFV-100",
+        "category": "edifice",
+        "gender": "men",
+        "price": 1800000,
+        "isSale": false,
+        "stock": 15,
+        "sold": 30,
+        "status": "active",
+        "rating": 4.3,
+        "reviewCount": 8,
+        "image": "/images/edifice.png",
+        "description": "Thanh lịch, phù hợp công sở."
+    },
+    {
+        "id": 3,
+        "name": "Vintage A168",
+        "category": "vintage",
+        "gender": "unisex",
+        "price": 1200000,
+        "salePrice": 990000,
+        "isSale": true,
+        "discount": 15,
+        "stock": 20,
+        "sold": 70,
+        "status": "active",
+        "rating": 4.6,
+        "reviewCount": 20,
+        "image": "/images/vintage.png",
+        "description": "Phong cách cổ điển."
+    }
+]

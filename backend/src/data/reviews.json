@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "productId": 1,
+        "userId": 2,
+        "rating": 5,
+        "comment": "Rất đẹp và bền!",
+        "createdAt": "2026-04-16"
+    },
+    {
+        "id": 2,
+        "productId": 1,
+        "userId": 2,
+        "rating": 4,
+        "comment": "Đeo khá ổn.",
+        "createdAt": "2026-04-16"
+    }
+]
