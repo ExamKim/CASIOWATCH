@@ -1,5 +1,5 @@
 const path = require("path");
-const { readJson } = require("../utils/fileDb");
+const { readJson, writeJson } = require("../utils/fileDb");
 const e = require("express");
 
 const filePath = path.join(__dirname, "../data/products.json");
