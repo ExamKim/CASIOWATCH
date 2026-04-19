@@ -10,6 +10,10 @@ app.get("/", (req, res) => {
     res.json({ message: "Backend is running" });
 });
 
+const authRoutes = require("./routes/authRoutes");
+app.use("/auth", authRoutes);
+const userRoutes = require("./routes/userRoutes");
+app.use("/users", userRoutes);
 
 const productRoutes = require("./routes/productRoutes");
 app.use("/products", productRoutes);
@@ -18,5 +22,8 @@ app.use("/products", productRoutes);
 
 const errorHandler = require("./middlewares/errorHandler");
 app.use(errorHandler);
+
+
+
 
 module.exports = app;

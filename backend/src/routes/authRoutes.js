@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const { register, login } = require("../controllers/authController");
+const { register, login } = require("../controllers/authController.js");
 
 // Dang ky
-router.post("/register", authController.register);
+router.post("/register", register);
 // Dang nhap
-router.post("/login", authController.login);
+router.post("/login", login);
 
 module.exports = router;
