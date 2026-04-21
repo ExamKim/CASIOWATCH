@@ -66,6 +66,9 @@ VALUES
   ('Casio Edifice ECB-10', 'analog-digital', 'men', 'EDIFICE', 160.00, 140.00, 10, 'inactive'),
   ('Casio Vintage LA670', 'digital', 'women', 'CASIO', 29.99, NULL, 60, 'active');
 
+ALTER TABLE products ADD COLUMN image_url VARCHAR(500) NULL AFTER brand;
+
+
 USE casio;
 
 UPDATE products SET image_url = '/images/dw-5600.jpg'
