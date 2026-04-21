@@ -66,8 +66,6 @@ VALUES
   ('Casio Edifice ECB-10', 'analog-digital', 'men', 'EDIFICE', 160.00, 140.00, 10, 'inactive'),
   ('Casio Vintage LA670', 'digital', 'women', 'CASIO', 29.99, NULL, 60, 'active');
 
-ALTER TABLE products ADD COLUMN image_url VARCHAR(500) NULL AFTER brand;
-
 
 USE casio;
 
@@ -101,5 +99,13 @@ WHERE name = 'Casio Edifice ECB-10';
 UPDATE products SET image_url = '/images/la670.jpg'
 WHERE name = 'Casio Vintage LA670';
 
+CREATE TABLE cart_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  product_id INT,
+  quantity INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (user_id, product_id)
+);
 
 

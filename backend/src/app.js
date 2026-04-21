@@ -18,6 +18,12 @@ app.use("/users", userRoutes);
 const productRoutes = require("./routes/productRoutes");
 app.use("/products", productRoutes);
 
+const cartRoutes = require("./routes/cartRoutes");
+app.use("/cart", cartRoutes);
+
+const orderRoutes = require("./routes/orderRoutes");
+app.use("/orders", orderRoutes);
+
 
 
 const errorHandler = require("./middlewares/errorHandler");
