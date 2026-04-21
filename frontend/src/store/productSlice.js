@@ -5,7 +5,7 @@ export const fetchProductsThunk = createAsyncThunk(
     "products/fetchProducts",
     async (filters, { rejectWithValue }) => {
         try {
-            const res = await productsApi.getProducts(filters);
+            const res = await productApi.getProducts(filters);
             // BE trả: { data, pagination }
             return res.data;
         } catch (err) {
