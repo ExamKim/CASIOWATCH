@@ -1,31 +1,31 @@
-const path = require("path");
-const { readJson, writeJson } = require("../utils/fileDb");
-const e = require("express");
+const productService = require("../services/productService");
 
-const filePath = path.join(__dirname, "../data/products.json");
-
-
-// lấy tất cả sản phẩm
 exports.getAllProducts = async (req, res, next) => {
     try {
-        const products = await readJson(filePath);
-        res.json(products);
+        const { q, brand, minPrice, maxPrice, sort, page, limit } = req.query;
+
+        const { rows, pagination } = await productService.list({
+            q,
+            brand,
+            minPrice,
+            maxPrice,
+            sort,
+            page,
+            limit,
+        });
+
+        res.json({ data: rows, pagination });
     } catch (err) {
         next(err);
     }
 };
 
-// lấy sản phẩm theo id
 exports.getProductById = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
-        const products = await readJson(filePath);
+        const product = await productService.findById(id);
 
-        const product = products.find(p => p.id === id);
-
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }
+        if (!product) return res.status(404).json({ message: "Product not found" });
 
         res.json(product);
     } catch (err) {
@@ -35,9 +35,8 @@ exports.getProductById = async (req, res, next) => {
 
 exports.getSaleProducts = async (req, res, next) => {
     try {
-        const products = await readJson(filePath);
-        const saleProducts = products.filter(p => p.salePrice < p.price);
-        res.json(saleProducts);
+        const rows = await productService.listSale();
+        res.json(rows);
     } catch (err) {
         next(err);
     }
@@ -45,14 +44,8 @@ exports.getSaleProducts = async (req, res, next) => {
 
 exports.createProduct = async (req, res, next) => {
     try {
-        const products = await readJson(filePath);
-        const newProduct = {
-            id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
-            ...req.body
-        };
-        products.push(newProduct);
-        await writeJson(filePath, products);
-        res.status(201).json(newProduct);
+        const created = await productService.create(req.body || {});
+        res.status(201).json(created);
     } catch (err) {
         next(err);
     }
@@ -61,14 +54,12 @@ exports.createProduct = async (req, res, next) => {
 exports.updateProduct = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
-        const products = await readJson(filePath);
-        const index = products.findIndex(p => p.id === id);
-        if (index === -1) {
-            return res.status(404).json({ message: "Product not found" });
-        }
-        products[index] = { ...products[index], ...req.body };
-        await writeJson(filePath, products);
-        res.json(products[index]);
+
+        const existing = await productService.findById(id);
+        if (!existing) return res.status(404).json({ message: "Product not found" });
+
+        const updated = await productService.update(id, req.body || {});
+        res.json(updated);
     } catch (err) {
         next(err);
     }
@@ -77,13 +68,12 @@ exports.updateProduct = async (req, res, next) => {
 exports.deleteProduct = async (req, res, next) => {
     try {
         const id = parseInt(req.params.id);
-        const products = await readJson(filePath);
-        const updatedProducts = products.filter(p => p.id !== id);
-        await writeJson(filePath, updatedProducts);
+        const ok = await productService.remove(id);
+
+        if (!ok) return res.status(404).json({ message: "Product not found" });
+
         res.json({ message: "Product deleted" });
-    }
-    catch (err) {
+    } catch (err) {
         next(err);
     }
 };
-

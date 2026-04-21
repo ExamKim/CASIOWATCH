@@ -65,3 +65,38 @@ VALUES
   ('Casio Baby-G BA-110', 'analog-digital', 'women', 'BABY-G', 105.00, NULL, 20, 'active'),
   ('Casio Edifice ECB-10', 'analog-digital', 'men', 'EDIFICE', 160.00, 140.00, 10, 'inactive'),
   ('Casio Vintage LA670', 'digital', 'women', 'CASIO', 29.99, NULL, 60, 'active');
+
+USE casio;
+
+UPDATE products SET image_url = '/images/dw-5600.jpg'
+WHERE name = 'Casio G-Shock DW-5600';
+
+UPDATE products SET image_url = '/images/ga-2100.jpg'
+WHERE name = 'Casio G-Shock GA-2100';
+
+UPDATE products SET image_url = '/images/a168.jpg'
+WHERE name = 'Casio Vintage A168';
+
+UPDATE products SET image_url = '/images/f-91w.jpg'
+WHERE name = 'Casio F-91W';
+
+UPDATE products SET image_url = '/images/efv-100.jpg'
+WHERE name = 'Casio Edifice EFV-100';
+
+UPDATE products SET image_url = '/images/she-4050.jpg'
+WHERE name = 'Casio Sheen SHE-4050';
+
+UPDATE products SET image_url = '/images/prg-270.jpg'
+WHERE name = 'Casio Pro Trek PRG-270';
+
+UPDATE products SET image_url = '/images/ba-110.jpg'
+WHERE name = 'Casio Baby-G BA-110';
+
+UPDATE products SET image_url = '/images/ecb-10.jpg'
+WHERE name = 'Casio Edifice ECB-10';
+
+UPDATE products SET image_url = '/images/la670.jpg'
+WHERE name = 'Casio Vintage LA670';
+
+
+
