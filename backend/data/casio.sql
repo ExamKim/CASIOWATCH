@@ -99,7 +99,8 @@ WHERE name = 'Casio Edifice ECB-10';
 UPDATE products SET image_url = '/images/la670.jpg'
 WHERE name = 'Casio Vintage LA670';
 
-CREATE TABLE cart_items (
+CREATE TABLE 
+IF NOT EXISTS cart_items (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT,
   product_id INT,
@@ -107,5 +108,27 @@ CREATE TABLE cart_items (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE (user_id, product_id)
 );
+
+CREATE TABLE 
+IF NOT EXISTS orders (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  total_price DECIMAL(10,2),
+  status VARCHAR(50) DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE 
+IF NOT EXISTS order_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT,
+  product_id INT,
+  name VARCHAR(255),
+  price DECIMAL(10,2),
+  quantity INT
+);
+
+
+
 
 
