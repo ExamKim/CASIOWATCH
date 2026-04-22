@@ -1,11 +1,10 @@
 import axiosClient from "./axiosClient";
 
 const cartApi = {
-    getCarts: (params) => axiosClient.get("/carts", { params }),
-    getCartById: (id) => axiosClient.get(`/carts/${id}`),
-    addProductToCart: (cartId, productId, quantity) => axiosClient.post(`/carts/${cartId}/products`, { productId, quantity }),
-    updateCartItem: (cartId, itemId, quantity) => axiosClient.put(`/carts/${cartId}/items/${itemId}`, { quantity }),
-    removeItemFromCart: (cartId, itemId) => axiosClient.delete(`/carts/${cartId}/items/${itemId}`),
+    getCart: () => axiosClient.get("/cart"),
+    addToCart: (productId, quantity) => axiosClient.post("/cart/items", { productId, quantity }),
+    updateCartItem: (productId, quantity) => axiosClient.put(`/cart/items/${productId}`, { quantity }),
+    removeFromCart: (productId) => axiosClient.delete(`/cart/items/${productId}`),
 };
 
 export default cartApi;

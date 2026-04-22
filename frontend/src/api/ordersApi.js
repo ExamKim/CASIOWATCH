@@ -2,10 +2,10 @@ import axiosClient from "./axiosClient";
 
 const ordersApi = {
     getOrders: (params) => axiosClient.get("/orders", { params }),
+    getMyOrders: (params) => axiosClient.get("/orders/my", { params }),
     getOrderById: (id) => axiosClient.get(`/orders/${id}`),
-    createOrder: (orderData) => axiosClient.post("/orders", orderData),
-    updateOrder: (id, orderData) => axiosClient.put(`/orders/${id}`, orderData),
-    deleteOrder: (id) => axiosClient.delete(`/orders/${id}`),
+    createOrder: () => axiosClient.post("/orders", {}),
+    updateOrderStatus: (id, status) => axiosClient.put(`/orders/${id}/status`, { status }),
 };
 
 export default ordersApi;
