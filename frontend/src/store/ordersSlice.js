@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import orderApi from "../api/orderApi";
+import ordersApi from "../api/ordersApi";
 
 export const fetchOrdersThunk = createAsyncThunk(
     "orders/fetchOrders",
     async (filters, { rejectWithValue }) => {
         try {
-            const res = await orderApi.getOrders(filters);
+            const res = await ordersApi.getOrders(filters);
             return res.data;
         } catch (err) {
             return rejectWithValue(err.response?.data || { message: err.message });
@@ -21,7 +21,7 @@ const initialState = {
     error: null,
 };
 
-const orderSlice = createSlice({
+const ordersSlice = createSlice({
     name: "orders",
     initialState,
     reducers: {
@@ -33,5 +33,5 @@ const orderSlice = createSlice({
         builder.addCase(fetchOrdersThunk.pending, (state) => { state.status = "loading"; state.error = null; }).addCase(fetchOrdersThunk.fulfilled, (state, action) => { state.status = "succeeded"; state.items = action.payload?.data || []; state.pagination = action.payload?.pagination || initialState.pagination; }).addCase(fetchOrdersThunk.rejected, (state, action) => { state.status = "failed"; state.error = action.payload?.message || "Fetch orders failed"; });
     },
 });
-export const { setOrdersFilters } = orderSlice.actions;
-export default orderSlice.reducer;
+export const { setOrdersFilters } = ordersSlice.actions;
+export default ordersSlice.reducer;
