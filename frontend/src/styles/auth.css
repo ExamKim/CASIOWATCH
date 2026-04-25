@@ -1,13 +1,13 @@
 .auth-container {
   display: flex;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 84px);
   background-color: #fff;
 }
 
 .auth-left {
   flex: 1;
   background-color: #1a1a1a;
-  padding: 60px 40px;
+  padding: 52px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -45,7 +45,7 @@
 
 .auth-right {
   flex: 1;
-  padding: 60px 40px;
+  padding: 52px 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -305,11 +305,11 @@
   }
 
   .auth-left {
-    padding: 40px 20px;
+    padding: 32px 20px;
   }
 
   .auth-right {
-    padding: 40px 20px;
+    padding: 32px 20px;
   }
 
   .auth-left h2 {
@@ -319,5 +319,107 @@
   .auth-watch-image {
     width: 200px;
     height: 200px;
+  }
+}
+
+.footer {
+  background: #0b0b0b;
+  color: #ccc;
+  padding: 42px 24px 20px;
+}
+
+.footer-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 28px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 30px;
+}
+
+.footer-col h4 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+.footer .logo {
+  color: #d4af37;
+  margin-bottom: 10px;
+}
+
+.footer-col p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-col li {
+  margin-bottom: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.footer-col li:hover {
+  color: #d4af37;
+}
+
+.newsletter {
+  display: flex;
+  margin-top: 15px;
+}
+
+.newsletter input {
+  flex: 1;
+  padding: 8px;
+  background: #1a1a1a;
+  border: none;
+  color: white;
+}
+
+.newsletter button {
+  background: #d4af37;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.social span {
+  display: inline-block;
+  border: 1px solid #555;
+  padding: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.social span:hover {
+  background: #d4af37;
+  color: black;
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 20px;
+  color: #777;
+}
+
+@media (max-width: 1024px) {
+  .footer {
+    padding: 36px 20px 20px;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-container {
+    grid-template-columns: 1fr;
   }
 }
