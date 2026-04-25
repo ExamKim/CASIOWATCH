@@ -127,3 +127,4 @@ const cartSlice = createSlice({
 });
 
 export const { clearCart } = cartSlice.actions;
+export default cartSlice.reducer;
