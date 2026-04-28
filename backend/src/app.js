@@ -24,6 +24,9 @@ app.use("/cart", cartRoutes);
 const orderRoutes = require("./routes/orderRoutes");
 app.use("/orders", orderRoutes);
 
+const paymentRoutes = require("./routes/paymentRoutes");
+app.use("/payments", paymentRoutes);
+
 
 
 const errorHandler = require("./middlewares/errorHandler");
