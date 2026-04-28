@@ -42,6 +42,9 @@ CREATE TABLE IF NOT EXISTS products (
   INDEX idx_gender (gender)
 );
 
+DELETE FROM products;
+
+ALTER TABLE products AUTO_INCREMENT = 1;
 
 INSERT INTO products (name, category, gender, brand, price, image_url, stock)
 VALUES
@@ -122,4 +125,10 @@ IF NOT EXISTS order_items (
   quantity INT
 );
 
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS payment_method VARCHAR(20) NULL,
+  ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) NOT NULL DEFAULT 'unpaid',
+  ADD COLUMN IF NOT EXISTS payment_note VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS payment_qr_content TEXT NULL,
+  ADD COLUMN IF NOT EXISTS paid_at DATETIME NULL;
 
