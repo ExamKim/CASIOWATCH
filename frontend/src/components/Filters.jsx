@@ -1,29 +1,29 @@
-import React from "react";
+﻿import React from "react";
 
 const Filters = ({ filters, brands, onFilterChange, onReset }) => {
     return (
         <aside className="catalog-filters">
-            <h3 className="catalog-filters-title">Bo loc</h3>
+            <h3 className="catalog-filters-title">Bộ lọc</h3>
 
             <div className="catalog-filter-group">
-                <label htmlFor="search">Tim kiem</label>
+                <label htmlFor="search">Tìm kiếm</label>
                 <input
                     id="search"
                     type="text"
                     value={filters.q}
                     onChange={(e) => onFilterChange("q", e.target.value)}
-                    placeholder="Ten dong ho..."
+                    placeholder="Tên đồng hồ..."
                 />
             </div>
 
             <div className="catalog-filter-group">
-                <label htmlFor="brand">Thuong hieu</label>
+                <label htmlFor="brand">Thương hiệu</label>
                 <select
                     id="brand"
                     value={filters.brand}
                     onChange={(e) => onFilterChange("brand", e.target.value)}
                 >
-                    <option value="">Tat ca</option>
+                    <option value="">Tất cả</option>
                     {brands.map((brand) => (
                         <option key={brand} value={brand}>
                             {brand}
@@ -33,23 +33,23 @@ const Filters = ({ filters, brands, onFilterChange, onReset }) => {
             </div>
 
             <div className="catalog-filter-group">
-                <label htmlFor="sort">Sap xep</label>
+                <label htmlFor="sort">Sắp xếp</label>
                 <select
                     id="sort"
                     value={filters.sort}
                     onChange={(e) => onFilterChange("sort", e.target.value)}
                 >
-                    <option value="">Mac dinh</option>
-                    <option value="price_asc">Gia tang dan</option>
-                    <option value="price_desc">Gia giam dan</option>
-                    <option value="name_asc">Ten A-Z</option>
-                    <option value="name_desc">Ten Z-A</option>
+                    <option value="">Mặc định</option>
+                    <option value="price_asc">Giá tăng dần</option>
+                    <option value="price_desc">Giá giảm dần</option>
+                    <option value="name_asc">Tên A-Z</option>
+                    <option value="name_desc">Tên Z-A</option>
                 </select>
             </div>
 
             <div className="catalog-filter-grid">
                 <div className="catalog-filter-group">
-                    <label htmlFor="minPrice">Gia tu</label>
+                    <label htmlFor="minPrice">Giá từ</label>
                     <input
                         id="minPrice"
                         type="number"
@@ -61,7 +61,7 @@ const Filters = ({ filters, brands, onFilterChange, onReset }) => {
                 </div>
 
                 <div className="catalog-filter-group">
-                    <label htmlFor="maxPrice">Den</label>
+                    <label htmlFor="maxPrice">Đến</label>
                     <input
                         id="maxPrice"
                         type="number"
@@ -74,10 +74,11 @@ const Filters = ({ filters, brands, onFilterChange, onReset }) => {
             </div>
 
             <button type="button" className="catalog-reset-btn" onClick={onReset}>
-                Dat lai bo loc
+                Đặt lại bộ lọc
             </button>
         </aside>
     );
 };
 
 export default Filters;
+

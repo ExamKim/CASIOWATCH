@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import cartApi from "../api/cartApi";
@@ -33,7 +33,10 @@ const Cart = () => {
         }
     }, [dispatch, token]);
 
-    const cartItems = token ? (Array.isArray(items) ? items : []) : guestItems;
+    const cartItems = useMemo(
+        () => (token ? (Array.isArray(items) ? items : []) : guestItems),
+        [token, items, guestItems]
+    );
 
     const summary = useMemo(() => {
         const subtotal = cartItems.reduce((total, item) => {
@@ -73,7 +76,7 @@ const Cart = () => {
             }
             await refreshCart();
         } catch (err) {
-            setNotice(err?.response?.data?.message || "Khong the cap nhat gio hang");
+            setNotice(err?.response?.data?.message || "Không thể cập nhật giỏ hàng");
         } finally {
             setActionLoadingId(null);
         }
@@ -90,7 +93,7 @@ const Cart = () => {
             }
             await refreshCart();
         } catch (err) {
-            setNotice(err?.response?.data?.message || "Khong the xoa san pham");
+            setNotice(err?.response?.data?.message || "Không thể xóa sản phẩm");
         } finally {
             setActionLoadingId(null);
         }
@@ -99,20 +102,20 @@ const Cart = () => {
     return (
         <div className="cart-page">
             <section className="cart-hero">
-                <p className="cart-kicker">Gio hang cua ban</p>
-                <h1>Gio hàng của bạn</h1>
+                <p className="cart-kicker">Giỏ hàng của bạn</p>
+                <h1>Giỏ hàng của bạn</h1>
                 <p>Kiểm tra, chỉnh số lượng và hoàn tất đơn hàng với các mẫu Casio bạn đã chọn.</p>
             </section>
 
             {notice && <div className="cart-notice">{notice}</div>}
 
-            {token && status === "loading" && <p className="cart-status">Dang tai gio hang...</p>}
+            {token && status === "loading" && <p className="cart-status">Đang tải giỏ hàng...</p>}
 
             {status !== "loading" && cartItems.length === 0 && (
                 <section className="cart-empty">
                     <h2>Giỏ hàng đang trống</h2>
                     <p>Bạn chưa thêm sản phẩm nào. Hãy khám phá bộ sưu tập để chọn mẫu yêu thích.</p>
-                    <Link to="/products" className="cart-continue-btn">Tiep tuc mua sam</Link>
+                    <Link to="/products" className="cart-continue-btn">Tiếp tục mua sắm</Link>
                 </section>
             )}
 
@@ -121,10 +124,10 @@ const Cart = () => {
                     <div className="cart-items-panel">
                         <div className="cart-panel-head">
                             <div>
-                                <p className="cart-panel-kicker">Chi tiet don hang</p>
-                                <h2>Ky thuat va phong cach</h2>
+                                <p className="cart-panel-kicker">Chi tiết đơn hàng</p>
+                                <h2>Kỹ thuật và phong cách</h2>
                             </div>
-                            <span className="cart-items-count">{cartItems.length} san pham</span>
+                            <span className="cart-items-count">{cartItems.length} sản phẩm</span>
                         </div>
 
                         <div className="cart-items-list">
@@ -179,7 +182,7 @@ const Cart = () => {
                                                     onClick={() => handleRemoveItem(item.product_id)}
                                                     disabled={actionLoadingId === item.product_id}
                                                 >
-                                                    Xoa
+                                                    Xóa
                                                 </button>
                                             </div>
                                         </div>
@@ -204,36 +207,36 @@ const Cart = () => {
                     </div>
 
                     <aside className="cart-summary-panel">
-                        <p className="cart-panel-kicker">Tom tat</p>
-                        <h2>Don hang cua ban</h2>
+                        <p className="cart-panel-kicker">Tóm tắt</p>
+                        <h2>Đơn hàng của bạn</h2>
 
                         <div className="cart-summary-lines">
                             <div>
-                                <span>Tong tam tinh</span>
+                                <span>Tổng tạm tính</span>
                                 <strong>{formatPrice(summary.subtotal)}</strong>
                             </div>
                             <div>
-                                <span>Phi van chuyen</span>
-                                <strong>{summary.shipping === 0 ? "Mien phi" : formatPrice(summary.shipping)}</strong>
+                                <span>Phí vận chuyển</span>
+                                <strong>{summary.shipping === 0 ? "Miễn phí" : formatPrice(summary.shipping)}</strong>
                             </div>
                             <div>
-                                <span>Giam gia</span>
+                                <span>Giảm giá</span>
                                 <strong>{summary.discount === 0 ? "0 đ" : formatPrice(summary.discount)}</strong>
                             </div>
                         </div>
 
                         <div className="cart-summary-total">
-                            <span>Tong cong</span>
+                            <span>Tổng cộng</span>
                             <strong>{formatPrice(summary.total)}</strong>
                         </div>
 
                         <Link to="/checkout" className="cart-checkout-btn">
-                            Tien hanh thanh toan
+                            Tiến hành thanh toán
                         </Link>
 
                         <div className="cart-summary-notes">
-                            <p>Thanh toan an toan va ho tro doi tra trong 7 ngay.</p>
-                            <p>Ho tro tu van san pham qua dien thoai va chat truc tuyen.</p>
+                            <p>Thanh toán an toàn và hỗ trợ đổi trả trong 7 ngày.</p>
+                            <p>Hỗ trợ tư vấn sản phẩm qua điện thoại và chat trực tuyến.</p>
                         </div>
                     </aside>
                 </section>

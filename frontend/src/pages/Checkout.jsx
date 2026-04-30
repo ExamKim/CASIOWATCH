@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import orderApi from "../api/orderApi";
+import { createOrderThunk } from "../store/ordersSlice";
 import { fetchCartThunk } from "../store/cartSlice";
-import { clearGuestCart, getGuestCart } from "../utils/guestCart";
+import { addToast } from "../store/uiSlice";
 import { getProductImage } from "../utils/productImage";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/catalog.css";
@@ -20,9 +20,7 @@ function formatPrice(value) {
 const Checkout = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const { token } = useSelector((state) => state.auth);
     const { items: cartItems } = useSelector((state) => state.cart);
-    const [guestItems, setGuestItems] = useState([]);
     const [status, setStatus] = useState("idle");
     const [message, setMessage] = useState("");
     const [formData, setFormData] = useState({
@@ -34,17 +32,10 @@ const Checkout = () => {
     });
 
     useEffect(() => {
-        if (token) {
-            dispatch(fetchCartThunk());
-        } else {
-            setGuestItems(getGuestCart());
-        }
-    }, [dispatch, token]);
+        dispatch(fetchCartThunk());
+    }, [dispatch]);
 
-    const items = useMemo(
-        () => (token ? (Array.isArray(cartItems) ? cartItems : []) : guestItems),
-        [token, cartItems, guestItems]
-    );
+    const items = useMemo(() => (Array.isArray(cartItems) ? cartItems : []), [cartItems]);
 
     const summary = useMemo(() => {
         const subtotal = items.reduce((total, item) => {
@@ -72,26 +63,20 @@ const Checkout = () => {
             setMessage("");
 
             if (items.length === 0) {
-                setMessage("Gio hang dang trong.");
+                setMessage("Giỏ hàng đang trống.");
                 setStatus("idle");
                 return;
             }
 
-            if (token) {
-                const res = await orderApi.createOrder({
-                    ...formData,
-                    paymentMethod: formData.paymentMethod,
-                });
-                await dispatch(fetchCartThunk());
-                setMessage("Dat hang thanh cong. Ma don: " + (res.data?.id || "N/A"));
-                navigate("/products");
-            } else {
-                clearGuestCart();
-                setGuestItems([]);
-                setMessage("Dat hang thanh cong tren che do thu nghiem.");
-            }
+            const order = await dispatch(createOrderThunk()).unwrap();
+            await dispatch(fetchCartThunk());
+
+            dispatch(addToast({ type: "success", message: "Tạo đơn hàng thành công" }));
+            navigate(`/payment?orderId=${order?.id}`);
         } catch (err) {
-            setMessage(err?.response?.data?.message || "Khong the tao don hang");
+            const content = typeof err === "string" ? err : "Không thể tạo đơn hàng";
+            setMessage(content);
+            dispatch(addToast({ type: "error", message: content }));
         } finally {
             setStatus("idle");
         }
@@ -102,7 +87,7 @@ const Checkout = () => {
             <section className="checkout-hero">
                 <p className="checkout-kicker">Thanh toán</p>
                 <h1>Thanh Toán</h1>
-                <p>Hoan tat don hang cua ban de san pham co the duoc gui di ngay.</p>
+                <p>Hoàn tất đơn hàng của bạn để sản phẩm có thể được gửi đi ngay.</p>
             </section>
 
             {message && <div className="checkout-message">{message}</div>}
@@ -222,7 +207,7 @@ const Checkout = () => {
                     </div>
 
                     <button type="submit" className="checkout-submit-btn" disabled={status === "loading"}>
-                        {status === "loading" ? "Dang xu ly..." : "Dat hang ngay"}
+                        {status === "loading" ? "Đang xử lý..." : "Đặt hàng ngay"}
                     </button>
 
                     <p className="checkout-note">Thanh toán an toàn và hỗ trợ đổi trả trong 7 ngày.</p>

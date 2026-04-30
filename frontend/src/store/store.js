@@ -3,6 +3,8 @@ import authReducer from "./authSlice";
 import productReducer from "./productSlice";
 import orderReducer from "./ordersSlice";
 import cartReducer from "./cartSlice";
+import paymentReducer from "./paymentSlice";
+import uiReducer from "./uiSlice";
 
 
 export const store = configureStore({
@@ -11,5 +13,7 @@ export const store = configureStore({
         products: productReducer,
         orders: orderReducer,
         cart: cartReducer,
+        payment: paymentReducer,
+        ui: uiReducer,
     },
 });

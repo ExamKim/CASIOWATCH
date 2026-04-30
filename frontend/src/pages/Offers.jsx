@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link } from 'react-router-dom';
 import SiteFooter from '../components/SiteFooter';
 import '../styles/offers.css';
@@ -9,24 +9,24 @@ const Offers = () => {
             <section className="offers-hero">
                 <div className="offers-hero-overlay" />
                 <div className="offers-hero-inner">
-                    <p className="offers-kicker">Bo suu tap uu dai</p>
+                    <p className="offers-kicker">Bộ sưu tập ưu đãi</p>
                     <h1>
-                        Chuong trinh <br />
-                        Uu dai dac quyen
+                        Chương trình <br />
+                        Ưu đãi đặc quyền
                     </h1>
                     <p>
-                        Kham pha nhung uu dai theo mua, voucher rieng cho thanh vien va cac goi
-                        dong hanh cao cap trong he sinh thai Casio.
+                        Khám phá những ưu đãi theo mùa, voucher riêng cho thành viên và các gói
+                        đồng hành cao cấp trong hệ sinh thái Casio.
                     </p>
                     <Link to="/products" className="offers-hero-btn">
-                        Kiem tra uu dai ngay
+                        Kiểm tra ưu đãi ngay
                     </Link>
                 </div>
             </section>
 
             <section className="offers-section">
                 <div className="offers-section-head">
-                    <h2>Danh muc Uu dai</h2>
+                    <h2>Danh mục ưu đãi</h2>
                     <span>Curated selection / winter 2024</span>
                 </div>
                 <span className="offers-heading-line" aria-hidden="true" />
@@ -34,12 +34,12 @@ const Offers = () => {
                 <div className="offers-curated-grid">
                     <article className="offer-tile offer-tile-intro">
                         <p className="offer-kicker">Limited time</p>
-                        <h3>Flash Sale 20% cho dong G-SHOCK</h3>
+                        <h3>Flash Sale 20% cho dòng G-SHOCK</h3>
                         <p>
-                            Suc manh cua su ben bi ket hop cung phong cach hien dai. Uu dai lon nhat
-                            trong nam cho dong san pham bieu tuong.
+                            Sức mạnh của sự bền bỉ kết hợp cùng phong cách hiện đại. Ưu đãi lớn nhất
+                            trong năm cho dòng sản phẩm biểu tượng.
                         </p>
-                        <Link to="/products" className="offer-outline-btn">Chi tiet uu dai</Link>
+                        <Link to="/products" className="offer-outline-btn">Chi tiết ưu đãi</Link>
                     </article>
 
                     <article className="offer-tile offer-tile-image offer-tile-gshock">
@@ -52,12 +52,12 @@ const Offers = () => {
                             <img src="/img/login1.jpg" alt="Heritage collection" />
                         </div>
                         <div className="offer-subcopy">
-                            <h3>Uu dai Heritage Collection</h3>
+                            <h3>Ưu đãi Heritage Collection</h3>
                             <p>
-                                Dong co diem mang tinh bieu tuong, tai hien nhung gia tri truong ton
-                                cua Casio qua cac thap ky.
+                                Dòng cổ điển mang tính biểu tượng, tái hiện những giá trị trường tồn
+                                của Casio qua các thập kỷ.
                             </p>
-                            <Link to="/products">Kham pha ngay</Link>
+                            <Link to="/products">Khám phá ngay</Link>
                         </div>
                     </article>
 
@@ -66,12 +66,12 @@ const Offers = () => {
                             <img src="/img/login1.jpg" alt="Edifice combo" />
                         </div>
                         <div className="offer-subcopy">
-                            <h3>Combo Qua tang Edifice</h3>
+                            <h3>Combo Quà tặng Edifice</h3>
                             <p>
-                                Khi mua dong Edifice cao cap, nhan ngay bo ve sinh dong ho chuyen dung
-                                va bao hanh 5 nam.
+                                Khi mua dòng Edifice cao cấp, nhận ngay bộ vệ sinh đồng hồ chuyên dụng
+                                và bảo hành 5 năm.
                             </p>
-                            <Link to="/products">Kham pha ngay</Link>
+                            <Link to="/products">Khám phá ngay</Link>
                         </div>
                     </article>
 
@@ -81,24 +81,24 @@ const Offers = () => {
 
                     <article className="offer-tile offer-tile-curators">
                         <p className="offer-kicker">Special access</p>
-                        <h3>Thanh vien Curators</h3>
+                        <h3>Thành viên Curators</h3>
 
                         <div className="offer-benefits-grid">
-                            <p>Giam them 5% cho moi don hang</p>
-                            <p>Mien phi van chuyen hoa toc</p>
-                            <p>Truy cap som cac bo suu tap moi</p>
-                            <p>Moi tham du private event</p>
+                            <p>Giảm thêm 5% cho mỗi đơn hàng</p>
+                            <p>Miễn phí vận chuyển hỏa tốc</p>
+                            <p>Truy cập sớm các bộ sưu tập mới</p>
+                            <p>Mời tham dự private event</p>
                         </div>
 
-                        <button type="button">Dang ky thanh vien</button>
+                        <button type="button">Đăng ký thành viên</button>
                     </article>
                 </div>
 
                 <section className="offers-cta">
-                    <h3>Khong bao gio bo lo cac dot phat hanh gioi han</h3>
+                    <h3>Không bao giờ bỏ lỡ các đợt phát hành giới hạn</h3>
                     <div className="offers-cta-row">
-                        <input type="email" placeholder="Dia chi email cua ban" />
-                        <button type="button">Dang ky ngay</button>
+                        <input type="email" placeholder="Địa chỉ email của bạn" />
+                        <button type="button">Đăng ký ngay</button>
                     </div>
                 </section>
             </section>
@@ -109,3 +109,4 @@ const Offers = () => {
 };
 
 export default Offers;
+

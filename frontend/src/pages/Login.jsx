@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { loginThunk, clearAuthError } from '../store/authSlice';
+import { addToast } from '../store/uiSlice';
+import { meThunk } from '../store/authSlice';
 import '../styles/auth.css';
 
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { status, error } = useSelector(state => state.auth);
 
   const [formData, setFormData] = useState({
@@ -45,12 +48,14 @@ const Login = () => {
     }
 
     try {
-      const result = await dispatch(loginThunk(formData));
-      if (result.payload) {
-        navigate('/');
+      const result = await dispatch(loginThunk(formData)).unwrap();
+      if (result) {
+        const nextPath = location.state?.from || '/';
+        dispatch(addToast({ type: 'success', message: 'Đăng nhập thành công' }));
+        navigate(nextPath, { replace: true });
       }
     } catch (err) {
-      console.error('Login failed:', err);
+      dispatch(addToast({ type: 'error', message: typeof err === 'string' ? err : 'Đăng nhập thất bại' }));
     }
   };
 
@@ -59,14 +64,26 @@ const Login = () => {
   };
 
   const handleGoogleLogin = () => {
-    console.log('Google login clicked');
-    // TODO: Integrate with Google OAuth
+    // Redirect to backend Google OAuth start
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/auth/google`;
   };
 
   const handleFacebookLogin = () => {
-    console.log('Facebook login clicked');
-    // TODO: Integrate with Facebook OAuth
+    // Redirect to backend Facebook OAuth start
+    window.location.href = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/auth/facebook`;
   };
+
+  // If OAuth redirect returned a token in query, handle it
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    if (token) {
+      localStorage.setItem('token', token);
+      dispatch(meThunk());
+      const nextPath = location.state?.from || '/';
+      navigate(nextPath, { replace: true });
+    }
+  }, [location.search]);
 
   return (
     <>
@@ -75,7 +92,7 @@ const Login = () => {
           <img src="/img/login1.jpg" alt="" />
           <h3>Huyền Thoại Thời Gian</h3>
           <h2>CHẾ TÁC TỪ SỰ<br />HOÀN HẢO</h2>
-          <p>Mỗi chi tiết là nút mũi chứng chỉ ngoài nguyệt tính kỹ thuật kỹ năng thắp kỹ.</p>
+          <p>Mỗi chi tiết là dấu ấn của sự chuẩn xác, tinh thần kỹ thuật và tay nghề chế tác.</p>
         </div>
 
         <div className="auth-right">

@@ -1,14 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import paymentApi from '../api/paymentApi';
+import { normalizeApiError } from '../utils/apiError';
 
 export const payCOD = createAsyncThunk(
     'payment/payCOD',
     async (orderId, { rejectWithValue }) => {
         try {
             const res = await paymentApi.payCOD(orderId);
-            return res;
+            return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || err.message);
+            return rejectWithValue(normalizeApiError(err, 'COD payment failed'));
         }
     }
 );
@@ -18,9 +19,9 @@ export const createQR = createAsyncThunk(
     async (orderId, { rejectWithValue }) => {
         try {
             const res = await paymentApi.createQR(orderId);
-            return res;
+            return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || err.message);
+            return rejectWithValue(normalizeApiError(err, 'Create QR failed'));
         }
     }
 );

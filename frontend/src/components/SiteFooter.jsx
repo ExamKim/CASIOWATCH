@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 
 const SiteFooter = () => {
     return (
@@ -7,12 +7,12 @@ const SiteFooter = () => {
                 <div className="catalog-footer-col">
                     <h2 className="catalog-footer-logo">CASIO</h2>
                     <p>
-                        Noi hoi tu nhung thiet ke dong ho bieu tuong, ket hop tinh than ky thuat va
-                        ngon ngu thoi trang hien dai.
+                        Nơi hội tụ những thiết kế đồng hồ biểu tượng, kết hợp tinh thần kỹ thuật và
+                        ngôn ngữ thời trang hiện đại.
                     </p>
                     <div className="catalog-newsletter">
-                        <input type="email" placeholder="Email cua ban" />
-                        <button type="button">GUI</button>
+                        <input type="email" placeholder="Email của bạn" />
+                        <button type="button">GỬI</button>
                     </div>
                 </div>
 
@@ -29,20 +29,20 @@ const SiteFooter = () => {
                 <div className="catalog-footer-col">
                     <h4>Services</h4>
                     <ul>
-                        <li>Bao hanh toan cau</li>
-                        <li>Cham soc dong ho</li>
-                        <li>Tu van mua sam</li>
-                        <li>Cua hang</li>
+                        <li>Bảo hành toàn cầu</li>
+                        <li>Chăm sóc đồng hồ</li>
+                        <li>Tư vấn mua sắm</li>
+                        <li>Cửa hàng</li>
                     </ul>
                 </div>
 
                 <div className="catalog-footer-col">
                     <h4>Company</h4>
                     <ul>
-                        <li>Cau chuyen thuong hieu</li>
-                        <li>Tin tuc</li>
-                        <li>Su kien</li>
-                        <li>Lien he</li>
+                        <li>Câu chuyện thương hiệu</li>
+                        <li>Tin tức</li>
+                        <li>Sự kiện</li>
+                        <li>Liên hệ</li>
                     </ul>
                 </div>
             </div>
@@ -53,3 +53,4 @@ const SiteFooter = () => {
 };
 
 export default SiteFooter;
+

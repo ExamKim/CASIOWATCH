@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import cartApi from "../api/cartApi";
+import { normalizeApiError } from "../utils/apiError";
 
 export const fetchCartThunk = createAsyncThunk(
     "cart/fetchCart",
@@ -8,7 +9,7 @@ export const fetchCartThunk = createAsyncThunk(
             const response = await cartApi.getCart();
             return response.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Fetch cart failed") });
         }
     }
 );
@@ -20,7 +21,7 @@ export const addToCartThunk = createAsyncThunk(
             const response = await cartApi.addToCart(productId, quantity);
             return response.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Add to cart failed") });
         }
     }
 );
@@ -32,7 +33,7 @@ export const updateCartItemThunk = createAsyncThunk(
             const response = await cartApi.updateCartItem(productId, quantity);
             return response.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Update cart item failed") });
         }
     }
 );
@@ -44,7 +45,7 @@ export const removeFromCartThunk = createAsyncThunk(
             const response = await cartApi.removeFromCart(productId);
             return response.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Remove item failed") });
         }
     }
 );

@@ -1,0 +1,147 @@
+.admin-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(19, 121, 88, 0.12), transparent 30%),
+        linear-gradient(180deg, #f7f8f5 0%, #eff2eb 100%);
+}
+
+.admin-hero {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 20px 14px;
+}
+
+.admin-kicker {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1.6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1f7a58;
+}
+
+.admin-hero h1 {
+    margin: 10px 0 8px;
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+}
+
+.admin-hero p {
+    margin: 0;
+    color: #566157;
+}
+
+.admin-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 10px 20px 40px;
+}
+
+.admin-note,
+.admin-error,
+.admin-empty {
+    border: 1px solid #d8e2d7;
+    background: rgba(255, 255, 255, 0.86);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.admin-error {
+    border-color: #efcdc8;
+    color: #b83b2f;
+    background: #fff6f4;
+}
+
+.admin-product-form,
+.admin-table-wrap {
+    border: 1px solid #d8e2d7;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.86);
+    padding: 16px;
+}
+
+.admin-product-form {
+    margin-bottom: 14px;
+}
+
+.admin-product-form h2 {
+    margin: 0 0 12px;
+}
+
+.admin-grid-form {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.admin-grid-form input,
+.admin-grid-form select,
+.admin-row-actions button,
+.admin-link-btn {
+    height: 38px;
+    border-radius: 10px;
+    border: 1px solid #cad8cb;
+    background: #fff;
+    padding: 0 10px;
+    text-decoration: none;
+    color: #263326;
+}
+
+.admin-row-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.admin-row-actions button {
+    cursor: pointer;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 860px;
+}
+
+.admin-table th,
+.admin-table td {
+    text-align: left;
+    border-bottom: 1px solid #e8eee8;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.admin-table th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #5f6c61;
+}
+
+.admin-table select {
+    width: 100%;
+    min-width: 110px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #cad8cb;
+}
+
+@media (max-width: 980px) {
+    .admin-grid-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+
+    .admin-hero,
+    .admin-content {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .admin-grid-form {
+        grid-template-columns: 1fr;
+    }
+}

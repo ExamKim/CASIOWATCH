@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -82,8 +82,8 @@ const ProductCard = ({ product }) => {
                     <button type="button" className="catalog-buy-btn" onClick={handleBuyNow}>
                         Mua ngay
                     </button>
-                    <button type="button" className="catalog-icon-btn" aria-label="Them vao gio hang" onClick={handleAddToCart}>
-                        🛒
+                    <button type="button" className="catalog-icon-btn" aria-label="Thêm vào giỏ hàng" onClick={handleAddToCart}>
+                        ðŸ›’
                     </button>
                 </div>
             </div>
@@ -92,3 +92,4 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
+

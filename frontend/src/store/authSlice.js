@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { authApi } from "../api/authApi";
+import { normalizeApiError } from "../utils/apiError";
 
 const initialState = {
     user: null,
@@ -16,7 +17,7 @@ export const registerThunk = createAsyncThunk(
             const data = await authApi.register(payload); // { user, token }
             return data;
         } catch (err) {
-            return rejectWithValue(err?.response?.data?.message || err.message);
+            return rejectWithValue(normalizeApiError(err, "Register failed"));
         }
     }
 );
@@ -29,7 +30,7 @@ export const loginThunk = createAsyncThunk(
             const data = await authApi.login(payload); // { user, token }
             return data;
         } catch (err) {
-            return rejectWithValue(err?.response?.data?.message || err.message);
+            return rejectWithValue(normalizeApiError(err, "Login failed"));
         }
     }
 );
@@ -42,7 +43,7 @@ export const meThunk = createAsyncThunk(
             const data = await authApi.me(); // user object
             return data;
         } catch (err) {
-            return rejectWithValue(err?.response?.data?.message || err.message);
+            return rejectWithValue(normalizeApiError(err, "Fetch user failed"));
         }
     }
 );

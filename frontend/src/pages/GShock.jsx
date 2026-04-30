@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Filters from "../components/Filters";
 import ProductCard from "../components/ProductCard";
@@ -11,22 +11,18 @@ import {
 } from "../store/productSlice";
 import "../styles/catalog.css";
 
-const STATIC_BRANDS = ["CASIO", "G-SHOCK", "EDIFICE", "BABY-G", "SHEEN", "PRO TREK"];
+import productsApi from "../api/productsApi";
 
-const Products = () => {
+const GShock = () => {
     const dispatch = useDispatch();
     const { items, pagination, filters, status, error } = useSelector((state) => state.products);
+    const [heroImage, setHeroImage] = useState('/img/login1.jpg');
 
-    // Clear all filters when entering Products page to always show all products.
     useEffect(() => {
+        // Apply category filter for G-Shock when this page mounts
         dispatch(
             setProductsFilters({
-                q: "",
-                brand: "",
-                category: "",
-                minPrice: "",
-                maxPrice: "",
-                sort: "",
+                category: "G-Shock",
                 page: 1,
                 limit: 12,
             })
@@ -34,16 +30,30 @@ const Products = () => {
     }, [dispatch]);
 
     useEffect(() => {
+        let mounted = true;
+        const loadHero = async () => {
+            try {
+                const res = await productsApi.getProducts({ category: 'G-Shock', page: 1, limit: 1 });
+                if (!mounted) return;
+                const img = res?.data?.data?.[0]?.image_url || '/img/login1.jpg';
+                setHeroImage(img);
+            } catch (err) {
+                // ignore
+            }
+        };
+
+        loadHero();
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    useEffect(() => {
         dispatch(fetchProductsThunk(filters));
     }, [dispatch, filters]);
 
     const brands = useMemo(() => {
-        const fromData = items
-            .map((item) => item?.brand)
-            .filter(Boolean)
-            .map((brand) => String(brand).trim());
-
-        return Array.from(new Set([...STATIC_BRANDS, ...fromData]));
+        return ["G-SHOCK"];
     }, [items]);
 
     const handleFilterChange = (key, value) => {
@@ -60,7 +70,6 @@ const Products = () => {
             setProductsFilters({
                 q: "",
                 brand: "",
-                category: "",
                 minPrice: "",
                 maxPrice: "",
                 sort: "",
@@ -79,15 +88,20 @@ const Products = () => {
 
     return (
         <div className="catalog-page">
-            <section className="catalog-hero">
+            <section
+                className="catalog-hero"
+                style={{
+                    backgroundImage: `linear-gradient(120deg, rgba(8, 8, 8, 0.96), rgba(8, 8, 8, 0.62)), url("${heroImage}")`,
+                }}
+            >
                 <div className="catalog-hero-overlay" />
                 <div className="catalog-hero-inner">
                     <div className="catalog-hero-copy">
-                        <p className="catalog-subheading">Danh mục tổng hợp</p>
-                        <h1>CASIO. Chọn phong cách của bạn</h1>
+                        <p className="catalog-subheading">Bộ sưu tập 2026</p>
+                        <h1>G-SHOCK. Bậc thầy chế tác</h1>
                         <p>
-                            Khám phá toàn bộ đồng hồ CASIO chính hãng từ G-SHOCK, BABY-G,
-                            EDIFICE đến nhiều dòng sản phẩm nổi bật khác.
+                            Khám phá những mẫu đồng hồ nổi bật với thiết kế bền bỉ, tinh tế và
+                            mang đậm nhận diện sang trọng của CASIO.
                         </p>
 
                         <div className="catalog-hero-stats">
@@ -108,7 +122,7 @@ const Products = () => {
 
                     <div className="catalog-hero-panel">
                         <img
-                            src="/img/login1.jpg"
+                            src={heroImage}
                             alt="Casio watch display"
                             onError={(e) => {
                                 e.currentTarget.src = "/img/login1.jpg";
@@ -134,7 +148,7 @@ const Products = () => {
                     <div className="catalog-toolbar">
                         <div>
                             <p className="catalog-kicker">Danh sách sản phẩm</p>
-                            <h2>Tất cả sản phẩm đồng hồ CASIO</h2>
+                            <h2>Đồng hồ thể hiện phong cách và độ bền</h2>
                         </div>
 
                         <div className="catalog-toolbar-summary">
@@ -202,5 +216,5 @@ const Products = () => {
     );
 };
 
-export default Products;
+export default GShock;
 

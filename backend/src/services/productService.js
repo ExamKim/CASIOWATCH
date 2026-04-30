@@ -16,7 +16,7 @@ function orderByFromSort(sort) {
     return map[sort] || "id DESC";
 }
 
-async function list({ q, brand, minPrice, maxPrice, sort, page = 1, limit = 12 }) {
+async function list({ q, brand, category, minPrice, maxPrice, sort, page = 1, limit = 12 }) {
     const _page = Math.max(1, Number(page) || 1);
     const _limit = Math.max(1, Math.min(100, Number(limit) || 12));
     const offset = (_page - 1) * _limit;
@@ -32,6 +32,11 @@ async function list({ q, brand, minPrice, maxPrice, sort, page = 1, limit = 12 }
     if (brand && String(brand).trim() !== "") {
         where.push("brand = ?");
         params.push(String(brand).trim());
+    }
+
+    if (category && String(category).trim() !== "") {
+        where.push("category = ?");
+        params.push(String(category).trim());
     }
 
     const min = toNum(minPrice);

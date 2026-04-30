@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import productsApi from '../api/productsApi';
 import ProductCard from '../components/ProductCard';
@@ -9,6 +9,7 @@ const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [status, setStatus] = useState('loading');
     const [error, setError] = useState('');
+    const [categoryImages, setCategoryImages] = useState({});
 
     useEffect(() => {
         let mounted = true;
@@ -26,11 +27,38 @@ const Home = () => {
             } catch (err) {
                 if (!mounted) return;
                 setStatus('failed');
-                setError(err?.response?.data?.message || 'Khong tai duoc san pham noi bat');
+                setError(err?.response?.data?.message || 'Không tải được sản phẩm nổi bật');
+            }
+        };
+
+        const loadCategoryImages = async () => {
+            try {
+                // map label -> category value in DB
+                const cats = [
+                    { key: 'gshock', category: 'G-Shock' },
+                    { key: 'baby-g', category: 'Baby-G' },
+                    { key: 'edifice', category: 'Edifice' },
+                ];
+
+                const results = await Promise.all(
+                    cats.map((c) => productsApi.getProducts({ category: c.category, page: 1, limit: 1 }))
+                );
+
+                const images = {};
+                results.forEach((res, idx) => {
+                    const c = cats[idx];
+                    const item = res?.data?.data?.[0];
+                    images[c.key] = item?.image_url || '/img/login1.jpg';
+                });
+
+                setCategoryImages(images);
+            } catch (err) {
+                // ignore, keep defaults
             }
         };
 
         loadFeatured();
+        loadCategoryImages();
 
         return () => {
             mounted = false;
@@ -77,20 +105,16 @@ const Home = () => {
 
             <section className="home-categories">
                 <div className="home-category-grid">
-                    <Link to="/products" className="home-category-card gshock">
-                        <img src="/img/login1.jpg" alt="G-SHOCK" />
+                    <Link to="/g-shock" className="home-category-card gshock">
+                        <img src={categoryImages['gshock'] || '/img/login1.jpg'} alt="G-SHOCK" />
                         <span>G-SHOCK</span>
                     </Link>
-                    <Link to="/products" className="home-category-card babyg">
-                        <img src="/img/login1.jpg" alt="BABY-G" />
+                    <Link to="/baby-g" className="home-category-card babyg">
+                        <img src={categoryImages['baby-g'] || '/img/login1.jpg'} alt="BABY-G" />
                         <span>BABY-G</span>
                     </Link>
-                    <Link to="/products" className="home-category-card vintage">
-                        <img src="/img/login1.jpg" alt="VINTAGE" />
-                        <span>VINTAGE</span>
-                    </Link>
-                    <Link to="/products" className="home-category-card edifice">
-                        <img src="/img/login1.jpg" alt="EDIFICE" />
+                    <Link to="/edifice" className="home-category-card edifice">
+                        <img src={categoryImages['edifice'] || '/img/login1.jpg'} alt="EDIFICE" />
                         <span>EDIFICE</span>
                     </Link>
                 </div>
@@ -107,7 +131,7 @@ const Home = () => {
                     </Link>
                 </div>
 
-                {status === 'loading' && <p className="home-status">Dang tai san pham...</p>}
+                {status === 'loading' && <p className="home-status">Đang tải sản phẩm...</p>}
                 {status === 'failed' && <p className="home-error">{error}</p>}
 
                 {status === 'succeeded' && (
@@ -119,17 +143,17 @@ const Home = () => {
                 )}
 
                 {status === 'succeeded' && featuredProducts.length === 0 && (
-                    <p className="home-status">Chua co san pham de hien thi.</p>
+                    <p className="home-status">Chưa có sản phẩm để hiển thị.</p>
                 )}
             </section>
 
             <section className="home-cta">
                 <div className="home-cta-inner">
-                    <h2>Gia nhap cong dong nguoi choi dong ho Casio</h2>
-                    <p>Nhan cap nhat bo suu tap moi, uu dai dinh ky va su kien doc quyen.</p>
+                    <h2>Gia nhập cộng đồng người chơi đồng hồ Casio</h2>
+                    <p>Nhận cập nhật bộ sưu tập mới, ưu đãi định kỳ và sự kiện độc quyền.</p>
                     <div className="home-cta-actions">
-                        <Link to="/register" className="home-primary-btn">Dang ky ngay</Link>
-                        <Link to="/products" className="home-secondary-btn">Xem san pham</Link>
+                        <Link to="/register" className="home-primary-btn">Đăng ký ngay</Link>
+                        <Link to="/products" className="home-secondary-btn">Xem sản phẩm</Link>
                     </div>
                 </div>
             </section>

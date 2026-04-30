@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import SiteFooter from '../components/SiteFooter';
 import '../styles/contact.css';
 
@@ -25,9 +25,9 @@ const Contact = () => {
         <div className="contact-page">
             <section className="contact-hero">
                 <div className="contact-hero-inner">
-                    <h1>Ket noi voi Ban Bien TSp</h1>
+                    <h1>Kết nối với Ban Biên Tập</h1>
                     <p>
-                        Cong thong tin danh rieng cho nhung nha suu tam va dam me dong ho cao cap.
+                        Cổng thông tin dành riêng cho những nhà sưu tầm và đam mê đồng hồ cao cấp.
                     </p>
                 </div>
             </section>
@@ -36,64 +36,64 @@ const Contact = () => {
                 <span className="contact-accent top" aria-hidden="true" />
                 <div className="contact-request-grid">
                     <article className="contact-request-form">
-                        <p className="contact-kicker">Yeu cau ho tro</p>
-                        <h1>Bat dau cuoc tro chuyen</h1>
+                        <p className="contact-kicker">Yêu cầu hỗ trợ</p>
+                        <h1>Bắt đầu cuộc trò chuyện</h1>
                         <p className="contact-lead">
-                            Du ban dang tim kiem mot mau dong ho hiem hay can tu van ky thuat ve dong
-                            MR-G moi nhat, cac chuyen gia cua chung toi luon san long ho tro.
+                            Dù bạn đang tìm kiếm một mẫu đồng hồ hiếm hay cần tư vấn kỹ thuật về dòng
+                            MR-G mới nhất, các chuyên gia của chúng tôi luôn sẵn lòng hỗ trợ.
                         </p>
 
                         <form className="contact-form" aria-label="Support request form">
                             <div className="contact-row-two">
                                 <label>
-                                    Ho va ten
+                                    Họ và tên
                                     <input type="text" placeholder="Nguyen Van A" />
                                 </label>
                                 <label>
-                                    Dia chi email
+                                    Địa chỉ email
                                     <input type="email" placeholder="email@example.com" />
                                 </label>
                             </div>
 
                             <label>
-                                Chu de quan tam
-                                <input type="text" placeholder="Tu van mua hang" />
+                                Chủ đề quan tâm
+                                <input type="text" placeholder="Tư vấn mua hàng" />
                             </label>
 
                             <label>
-                                Loi nhan
-                                <textarea rows="4" placeholder="Chung toi co the giup gi cho bo suu tap cua ban hom nay?" />
+                                Lời nhắn
+                                <textarea rows="4" placeholder="Chúng tôi có thể giúp gì cho bộ sưu tập của bạn hôm nay?" />
                             </label>
 
-                            <button type="button">Gui yeu cau</button>
+                            <button type="button">Gửi yêu cầu</button>
                         </form>
                     </article>
 
                     <aside className="contact-request-side">
-                        <p className="contact-kicker">Dich vu dac quyen</p>
-                        <h2>Trai nghiem mua sam Bespoke</h2>
+                        <p className="contact-kicker">Dịch vụ đặc quyền</p>
+                        <h2>Trải nghiệm mua sắm Bespoke</h2>
                         <p>
-                            Danh cho nhung nha suu tam tim kiem quyen tiep can cac phien ban gioi han
-                            va xem truoc san pham, doi ngu co van rieng cua chung toi se ket noi truc
-                            tiep voi ban.
+                            Dành cho những nhà sưu tầm tìm kiếm quyền tiếp cận các phiên bản giới hạn
+                            và xem trước sản phẩm, đội ngũ cố vấn riêng của chúng tôi sẽ kết nối trực
+                            tiếp với bạn.
                         </p>
 
                         <div className="contact-call-box">
                             <div>
-                                <strong>Yeu cau goi lai</strong>
-                                <span>Thong thuong duoc ket noi trong vong 2 gio</span>
+                                <strong>Yêu cầu gọi lại</strong>
+                                <span>Thông thường được kết nối trong vòng 2 giờ</span>
                             </div>
-                            <button type="button">Ket noi</button>
+                            <button type="button">Kết nối</button>
                         </div>
 
                         <div className="contact-support">
-                            <p className="contact-support-kicker">Ho tro tuc thi</p>
+                            <p className="contact-support-kicker">Hỗ trợ tức thì</p>
                             <div className="contact-support-row">
-                                <span>Ho tro toan cau</span>
+                                <span>Hỗ trợ toàn cầu</span>
                                 <strong>+44 (0) 20 7946 0123</strong>
                             </div>
                             <div className="contact-support-row">
-                                <span>Bao chi & Truyen thong</span>
+                                <span>Báo chí & Truyền thông</span>
                                 <strong>press@horologyeditorial.com</strong>
                             </div>
                         </div>
@@ -104,8 +104,8 @@ const Contact = () => {
             </section>
 
             <section className="contact-stores">
-                <p className="contact-kicker">He thong cua hang</p>
-                <h2>Khong gian trai nghiem Casio</h2>
+                <p className="contact-kicker">Hệ thống cửa hàng</p>
+                <h2>Không gian trải nghiệm Casio</h2>
 
                 <div className="contact-store-grid">
                     {stores.map((store) => (
@@ -131,3 +131,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

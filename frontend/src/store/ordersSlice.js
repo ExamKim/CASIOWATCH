@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ordersApi from "../api/ordersApi";
+import { normalizeApiError } from "../utils/apiError";
 
 // Admin - Get all orders
 export const fetchOrdersThunk = createAsyncThunk(
@@ -9,7 +10,7 @@ export const fetchOrdersThunk = createAsyncThunk(
             const res = await ordersApi.getOrders(filters);
             return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Fetch orders failed") });
         }
     }
 );
@@ -22,7 +23,7 @@ export const fetchMyOrdersThunk = createAsyncThunk(
             const res = await ordersApi.getMyOrders(filters);
             return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Fetch my orders failed") });
         }
     }
 );
@@ -35,7 +36,7 @@ export const fetchOrderByIdThunk = createAsyncThunk(
             const res = await ordersApi.getOrderById(orderId);
             return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Fetch order detail failed") });
         }
     }
 );
@@ -48,7 +49,7 @@ export const createOrderThunk = createAsyncThunk(
             const res = await ordersApi.createOrder();
             return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Create order failed") });
         }
     }
 );
@@ -61,7 +62,19 @@ export const updateOrderStatusThunk = createAsyncThunk(
             const res = await ordersApi.updateOrderStatus(orderId, status);
             return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Update order status failed") });
+        }
+    }
+);
+
+export const confirmOrderPaymentThunk = createAsyncThunk(
+    "orders/confirmOrderPayment",
+    async (orderId, { rejectWithValue }) => {
+        try {
+            const res = await ordersApi.confirmOrderPayment(orderId);
+            return res.data?.order || res.data;
+        } catch (err) {
+            return rejectWithValue({ message: normalizeApiError(err, "Confirm payment failed") });
         }
     }
 );
@@ -171,6 +184,24 @@ const ordersSlice = createSlice({
             .addCase(updateOrderStatusThunk.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload?.message || "Update order status failed";
+            })
+
+            .addCase(confirmOrderPaymentThunk.pending, (state) => {
+                state.status = "loading";
+                state.error = null;
+            })
+            .addCase(confirmOrderPaymentThunk.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                const updatedOrder = action.payload;
+                const allIndex = state.allOrders.findIndex((o) => o.id === updatedOrder.id);
+                if (allIndex !== -1) state.allOrders[allIndex] = updatedOrder;
+                const myIndex = state.myOrders.findIndex((o) => o.id === updatedOrder.id);
+                if (myIndex !== -1) state.myOrders[myIndex] = updatedOrder;
+                if (state.currentOrder?.id === updatedOrder.id) state.currentOrder = updatedOrder;
+            })
+            .addCase(confirmOrderPaymentThunk.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload?.message || "Confirm payment failed";
             });
     },
 });

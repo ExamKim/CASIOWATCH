@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import productsApi from "../api/productsApi";
@@ -56,7 +56,7 @@ const ProductDetail = () => {
             } catch (err) {
                 if (!mounted) return;
                 setStatus("failed");
-                setError(err?.response?.data?.message || "Khong tai duoc chi tiet san pham");
+                setError(err?.response?.data?.message || "Không tải được chi tiết sản phẩm");
             }
         };
 
@@ -70,7 +70,7 @@ const ProductDetail = () => {
     const resolvedProduct = useMemo(() => product || routeProduct, [product, routeProduct]);
 
     if (status === "loading") {
-        return <p className="catalog-status detail-status">Dang tai chi tiet san pham...</p>;
+        return <p className="catalog-status detail-status">Đang tải chi tiết sản phẩm...</p>;
     }
 
     if (status === "failed") {
@@ -78,7 +78,7 @@ const ProductDetail = () => {
     }
 
     if (!resolvedProduct) {
-        return <p className="catalog-status detail-status">San pham khong ton tai.</p>;
+        return <p className="catalog-status detail-status">Sản phẩm không tồn tại.</p>;
     }
 
     const hasSale = Number(resolvedProduct?.sale_price) > 0 && Number(resolvedProduct?.sale_price) < Number(resolvedProduct?.price);
@@ -149,55 +149,55 @@ const ProductDetail = () => {
 
                     <div className="detail-actions">
                         <button type="button" className="detail-buy-btn" onClick={handleAddToCart} disabled={isAdding}>
-                            {isAdding ? "Dang them..." : "Them vao gio hang"}
+                            {isAdding ? "Đang thêm..." : "Thêm vào giỏ hàng"}
                         </button>
-                        <button type="button" className="detail-icon-btn" aria-label="Yeu thich">
+                        <button type="button" className="detail-icon-btn" aria-label="Yêu thích">
                             ♡
                         </button>
-                        <button type="button" className="detail-icon-btn" aria-label="Chia se">
+                        <button type="button" className="detail-icon-btn" aria-label="Chia sẻ">
                             ↗
                         </button>
                     </div>
 
                     <div className="detail-meta">
-                        <span>Giao hang 24h</span>
-                        <span>Bao hanh chinh hang</span>
-                        <span>Ho tro doi tra</span>
+                        <span>Giao hàng 24h</span>
+                        <span>Bảo hành chính hãng</span>
+                        <span>Hỗ trợ đổi trả</span>
                     </div>
                 </div>
             </section>
 
             <section className="detail-story-grid">
                 <article className="detail-story-card detail-story-card-light">
-                    <p className="detail-section-kicker">Cau chuyen che tac</p>
-                    <h3>Cong nghe, do ben va hieu ung kim loai</h3>
+                    <p className="detail-section-kicker">Câu chuyện chế tác</p>
+                    <h3>Công nghệ, độ bền và hiệu ứng kim loại</h3>
                     <p>
-                        Mau dong ho nay goi y cam giac cua mot mon trang suc ky thuat: chan thuc,
-                        sang trong va tinh te. Cac duong net duoc goi gon de lam noi bat phan mat so,
-                        day deo va bo vo cứng cáp.
+                        Mẫu đồng hồ này gợi ý cảm giác của một món trang sức kỹ thuật: chân thực,
+                        sang trọng và tinh tế. Các đường nét được gói gọn để làm nổi bật phần mặt số,
+                        dây đeo và bộ vỏ cứng cáp.
                     </p>
-                    <a href="#detail-specs" className="detail-text-link">Kham pha ky thuat</a>
+                    <a href="#detail-specs" className="detail-text-link">Khám phá kỹ thuật</a>
                 </article>
 
                 <article className="detail-story-card detail-story-card-dark" id="detail-specs">
-                    <p className="detail-section-kicker detail-section-kicker-gold">Thong so ky thuat</p>
+                    <p className="detail-section-kicker detail-section-kicker-gold">Thông số kỹ thuật</p>
                     <ul className="detail-spec-list">
-                        <li><span>Chat lieu</span><strong>Thép không gỉ</strong></li>
-                        <li><span>Bo may</span><strong>Tough Solar</strong></li>
-                        <li><span>Chong nuoc</span><strong>200m Water</strong></li>
-                        <li><span>Ket noi</span><strong>Bluetooth</strong></li>
+                        <li><span>Chất liệu</span><strong>Thép không gỉ</strong></li>
+                        <li><span>Bộ máy</span><strong>Tough Solar</strong></li>
+                        <li><span>Chống nước</span><strong>200m Water</strong></li>
+                        <li><span>Kết nối</span><strong>Bluetooth</strong></li>
                     </ul>
-                    <div className="detail-spec-foot">Giu nguyen phong cach sang trong trong moi hoan canh.</div>
+                    <div className="detail-spec-foot">Giữ nguyên phong cách sang trọng trong mọi hoàn cảnh.</div>
                 </article>
             </section>
 
             <section className="detail-suggestions">
                 <div className="detail-suggestions-head">
                     <div>
-                        <p className="detail-section-kicker">Goi y cho ban</p>
+                        <p className="detail-section-kicker">Gợi ý cho bạn</p>
                         <h2>Khám phá những lựa chọn khác từ Casio</h2>
                     </div>
-                    <Link to="/products">Xem tat ca san pham</Link>
+                    <Link to="/products">Xem tất cả sản phẩm</Link>
                 </div>
 
                 <div className="catalog-grid">
@@ -213,3 +213,4 @@ const ProductDetail = () => {
 };
 
 export default ProductDetail;
+

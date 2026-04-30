@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import productsApi from "../api/productsApi";
+import { normalizeApiError } from "../utils/apiError";
 
 export const fetchProductsThunk = createAsyncThunk(
     "products/fetchProducts",
@@ -9,7 +10,7 @@ export const fetchProductsThunk = createAsyncThunk(
             // BE trả: { data, pagination }
             return res.data;
         } catch (err) {
-            return rejectWithValue(err.response?.data || { message: err.message });
+            return rejectWithValue({ message: normalizeApiError(err, "Fetch products failed") });
         }
     }
 );

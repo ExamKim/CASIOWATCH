@@ -89,7 +89,7 @@ const Register = () => {
           <img src="/img/login1.jpg" alt="" />
           <h3>Huyền Thoại Thời Gian</h3>
           <h2>CHẾ TÁC TỪ SỰ<br />HOÀN HẢO</h2>
-          <p>Mỗi chi tiết là nút mũi chứng chỉ ngoài nguyệt tính kỹ thuật kỹ năng th���p kỹ.</p>
+          <p>Mỗi chi tiết là dấu ấn của sự chuẩn xác, tinh thần kỹ thuật và tay nghề chế tác.</p>
         </div>
 
         <div className="auth-right">
