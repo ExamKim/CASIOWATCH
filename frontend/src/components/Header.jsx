@@ -97,7 +97,7 @@ const Header = () => {
 
   const mainLinks = [
     { label: 'TRANG CHỦ', to: '/' },
-    { label: 'DANH MỤC', to: '/products' },
+    { label: 'DANH MỤC', to: '/products', isDropdown: true },
     { label: 'G-SHOCK', to: '/g-shock' },
     { label: 'BABY-G', to: '/baby-g' },
     { label: 'EDIFICE', to: '/edifice' },
@@ -110,7 +110,6 @@ const Header = () => {
       <div className="header-container">
         <Link className="brand" to="/" aria-label="CASIO home">
           <span className="brand-mark">CASIO</span>
-          <span className="brand-tag">Luxury timepieces</span>
         </Link>
 
         <nav className="nav-links" aria-label="Main navigation">
