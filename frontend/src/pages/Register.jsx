@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerThunk, clearAuthError } from '../store/authSlice';
+import SiteFooter from '../components/SiteFooter';
 import '../styles/auth.css';
 
 const Register = () => {
@@ -226,63 +227,7 @@ const Register = () => {
         </div>
       </div>
 
-      <footer className="footer">
-        <div className="footer-container">
-          <div className="footer-col">
-            <h2 className="logo">CASIO</h2>
-            <p>
-              Người giám tuyển kỹ thuật số cho những kiệt tác thời gian.
-              Khám phá sự tinh hoa trong từng nhịp đập của thời khắc.
-            </p>
-
-            <div className="newsletter">
-              <input type="email" placeholder="Địa chỉ email của bạn" />
-              <button>GỬI</button>
-            </div>
-          </div>
-
-          <div className="footer-col">
-            <h4>COLLECTIONS</h4>
-            <ul>
-              <li>G-SHOCK MR-G</li>
-              <li>EDIFICE PREMIUM</li>
-              <li>VINTAGE GOLD</li>
-              <li>BESPOKE SERIES</li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4>SERVICES</h4>
-            <ul>
-              <li>Bảo hành toàn cầu</li>
-              <li>Chăm sóc đồng hồ</li>
-              <li>Dịch vụ đặt riêng</li>
-              <li>Tìm cửa hàng</li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4>COMPANY</h4>
-            <ul>
-              <li>Di sản thương hiệu</li>
-              <li>Kỹ thuật chế tác</li>
-              <li>Tin tức & sự kiện</li>
-              <li>Liên hệ</li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4>FOLLOW US</h4>
-            <div className="social">
-              <span>IG</span>
-              <span>FB</span>
-              <span>IN</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="footer-bottom">2026 CASIO ALL RIGHTS RESERVED</div>
-      </footer>
+      <SiteFooter />
     </>
   );
 };
