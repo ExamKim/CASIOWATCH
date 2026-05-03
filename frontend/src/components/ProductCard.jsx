@@ -83,7 +83,11 @@ const ProductCard = ({ product }) => {
                         Mua ngay
                     </button>
                     <button type="button" className="catalog-icon-btn" aria-label="Thêm vào giỏ hàng" onClick={handleAddToCart}>
-                        ðŸ›’
+                        <svg viewBox="0 0 24 24" className="header-icon-svg" aria-hidden="true">
+                            <path d="M4 5h2l2 10h10l2-7H7.2" />
+                            <circle cx="10" cy="19" r="1.5" />
+                            <circle cx="17" cy="19" r="1.5" />
+                        </svg>
                     </button>
                 </div>
             </div>
