@@ -59,7 +59,7 @@ VALUES
 ('Casio G-Shock GA-2100-4ADR', 'G-Shock', 'unisex', 'Casio', 3500000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-Shock_GA-2100-4ADR_vfhowy.jpg', 15),
 ('Casio G-Shock GA-2000-2ADR', 'G-Shock', 'men', 'Casio', 3700000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-Shock_GA-2000-2ADR_se91aa.jpg', 10),
 ('Casio G-Shock GA-100A-9AHDR', 'G-Shock', 'men', 'Casio', 3300000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117415/Casio_G-Shock_GA-100A-9AHDR_zqfp3n.jpg', 11),
-('Casio G-Shock DW-6900NB-7DR', 'G-Shock', 'unisex', 'Casio', 2900000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777118638/Casio%20G-Shock%20DW-6900NB-7DR.png', 10),
+
 
 -- ================= EDIFICE =================
 ('Casio Edifice EQB-1200AT-1ADR', 'Edifice', 'men', 'Casio', 12500000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117703/Casio_Edifice_EQB-1200AT-1ADR_zqrfgf.png', 5),
@@ -82,7 +82,6 @@ VALUES
 
 -- ================= G-SQUAD =================
 ('Casio G-SQUAD BSA-B100-4A1DR', 'G-SQUAD', 'women', 'Casio', 3500000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117874/Casio_G-SQUAD_BSA-B100-4A1DR_ydvx9w.jpg', 10),
-('Casio G-SQUAD GBD-200-1DR', 'G-SQUAD', 'men', 'Casio', 4800000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777119314/Casio%20G-SQUAD%20GBD-200-1DR.png', 8),
 
 -- ================= BABY-G =================
 ('Casio Baby-G BSA-B100MF-7ADR', 'Baby-G', 'women', 'Casio', 3200000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117874/Casio_Baby-G_BSA-B100MF-7ADR_gsfbmc.jpg', 9),

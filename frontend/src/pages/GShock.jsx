@@ -23,6 +23,7 @@ const GShock = () => {
         dispatch(
             setProductsFilters({
                 category: "G-Shock",
+                gender: [],
                 page: 1,
                 limit: 12,
             })
@@ -56,7 +57,23 @@ const GShock = () => {
         return ["G-SHOCK"];
     }, [items]);
 
-    const handleFilterChange = (key, value) => {
+    const handleFilterChange = (key, value, checked) => {
+        if (key === "gender") {
+            const current = Array.isArray(filters.gender) ? filters.gender : [];
+            const nextGender = checked
+                ? Array.from(new Set([...current, value]))
+                : current.filter((item) => item !== value);
+
+            dispatch(
+                setProductsFilters({
+                    ...filters,
+                    gender: nextGender,
+                    page: 1,
+                })
+            );
+            return;
+        }
+
         dispatch(
             setProductsFilters({
                 [key]: value,
@@ -70,6 +87,7 @@ const GShock = () => {
             setProductsFilters({
                 q: "",
                 brand: "",
+                gender: [],
                 minPrice: "",
                 maxPrice: "",
                 sort: "",

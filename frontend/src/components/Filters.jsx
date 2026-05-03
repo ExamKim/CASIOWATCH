@@ -1,6 +1,15 @@
 ﻿import React from "react";
 
-const Filters = ({ filters, brands, onFilterChange, onReset }) => {
+const GENDER_OPTIONS = [
+    { label: "Nam", value: "men" },
+    { label: "Nữ", value: "women" },
+    { label: "Unisex", value: "unisex" },
+];
+
+const Filters = ({ filters, categories, brands, onFilterChange, onReset }) => {
+    const categoryOptions = categories || brands || [];
+    const selectedGenders = Array.isArray(filters.gender) ? filters.gender : [];
+
     return (
         <aside className="catalog-filters">
             <h3 className="catalog-filters-title">Bộ lọc</h3>
@@ -17,19 +26,35 @@ const Filters = ({ filters, brands, onFilterChange, onReset }) => {
             </div>
 
             <div className="catalog-filter-group">
-                <label htmlFor="brand">Thương hiệu</label>
+                <label htmlFor="category">Dòng sản phẩm</label>
                 <select
-                    id="brand"
-                    value={filters.brand}
-                    onChange={(e) => onFilterChange("brand", e.target.value)}
+                    id="category"
+                    value={filters.category}
+                    onChange={(e) => onFilterChange("category", e.target.value)}
                 >
                     <option value="">Tất cả</option>
-                    {brands.map((brand) => (
-                        <option key={brand} value={brand}>
-                            {brand}
+                    {categoryOptions.map((category) => (
+                        <option key={category} value={category}>
+                            {category}
                         </option>
                     ))}
                 </select>
+            </div>
+
+            <div className="catalog-filter-group">
+                <label>Giới tính</label>
+                <div className="catalog-filter-checklist">
+                    {GENDER_OPTIONS.map((option) => (
+                        <label key={option.value} className="catalog-filter-check">
+                            <input
+                                type="checkbox"
+                                checked={selectedGenders.includes(option.value)}
+                                onChange={(e) => onFilterChange("gender", option.value, e.target.checked)}
+                            />
+                            <span>{option.label}</span>
+                        </label>
+                    ))}
+                </div>
             </div>
 
             <div className="catalog-filter-group">

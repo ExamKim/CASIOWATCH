@@ -4,77 +4,83 @@ import Filters from "../components/Filters";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 import SiteFooter from "../components/SiteFooter";
-import {
-    fetchProductsThunk,
-    setProductsFilters,
-    setProductsPage,
-} from "../store/productSlice";
+import { fetchProductsThunk, setProductsFilters, setProductsPage } from "../store/productSlice";
 import "../styles/catalog.css";
 
-const STATIC_BRANDS = ["CASIO", "G-SHOCK", "EDIFICE", "BABY-G", "SHEEN", "PRO TREK"];
+const DEFAULT_FILTERS = {
+    q: "",
+    category: "",
+    gender: [],
+    minPrice: "",
+    maxPrice: "",
+    sort: "",
+    page: 1,
+    limit: 12,
+};
+
+const STATIC_CATEGORIES = ["G-Shock", "Edifice", "Baby-G", "Vintage", "Classic", "G-SQUAD", "SHEEN", "PRO TREK"];
 
 const Products = () => {
     const dispatch = useDispatch();
     const { items, pagination, filters, status, error } = useSelector((state) => state.products);
 
-    // Clear all filters when entering Products page to always show all products.
     useEffect(() => {
-        dispatch(
-            setProductsFilters({
-                q: "",
-                brand: "",
-                category: "",
-                minPrice: "",
-                maxPrice: "",
-                sort: "",
-                page: 1,
-                limit: 12,
-            })
-        );
+        dispatch(setProductsFilters(DEFAULT_FILTERS));
+        dispatch(fetchProductsThunk(DEFAULT_FILTERS));
     }, [dispatch]);
 
-    useEffect(() => {
-        dispatch(fetchProductsThunk(filters));
-    }, [dispatch, filters]);
-
-    const brands = useMemo(() => {
+    const categories = useMemo(() => {
         const fromData = items
-            .map((item) => item?.brand)
+            .map((item) => item?.category)
             .filter(Boolean)
-            .map((brand) => String(brand).trim());
+            .map((category) => String(category).trim());
 
-        return Array.from(new Set([...STATIC_BRANDS, ...fromData]));
+        return Array.from(new Set([...STATIC_CATEGORIES, ...fromData]));
     }, [items]);
 
-    const handleFilterChange = (key, value) => {
-        dispatch(
-            setProductsFilters({
-                [key]: value,
+    const handleFilterChange = (key, value, checked) => {
+        if (key === "gender") {
+            const current = Array.isArray(filters.gender) ? filters.gender : [];
+            const nextGender = checked
+                ? Array.from(new Set([...current, value]))
+                : current.filter((item) => item !== value);
+
+            const nextFilters = {
+                ...filters,
+                gender: nextGender,
                 page: 1,
-            })
-        );
+            };
+
+            dispatch(setProductsFilters(nextFilters));
+            dispatch(fetchProductsThunk(nextFilters));
+            return;
+        }
+
+        const nextFilters = {
+            ...filters,
+            [key]: value,
+            page: 1,
+        };
+
+        dispatch(setProductsFilters(nextFilters));
+        dispatch(fetchProductsThunk(nextFilters));
     };
 
     const handleResetFilters = () => {
-        dispatch(
-            setProductsFilters({
-                q: "",
-                brand: "",
-                category: "",
-                minPrice: "",
-                maxPrice: "",
-                sort: "",
-                page: 1,
-                limit: 12,
-            })
-        );
+        dispatch(setProductsFilters(DEFAULT_FILTERS));
+        dispatch(fetchProductsThunk(DEFAULT_FILTERS));
     };
 
     const handlePageChange = (nextPage) => {
+        const nextFilters = {
+            ...filters,
+            page: nextPage,
+        };
+
         dispatch(setProductsPage(nextPage));
+        dispatch(fetchProductsThunk(nextFilters));
     };
 
-    const visibleProducts = items;
     const totalItems = pagination.total || 0;
 
     return (
@@ -86,8 +92,7 @@ const Products = () => {
                         <p className="catalog-subheading">Danh mục tổng hợp</p>
                         <h1>CASIO. Chọn phong cách của bạn</h1>
                         <p>
-                            Khám phá toàn bộ đồng hồ CASIO chính hãng từ G-SHOCK, BABY-G,
-                            EDIFICE đến nhiều dòng sản phẩm nổi bật khác.
+                            Khám phá toàn bộ đồng hồ CASIO chính hãng từ G-SHOCK, BABY-G, EDIFICE đến nhiều dòng sản phẩm nổi bật khác.
                         </p>
 
                         <div className="catalog-hero-stats">
@@ -125,7 +130,7 @@ const Products = () => {
             <section className="catalog-content">
                 <Filters
                     filters={filters}
-                    brands={brands}
+                    categories={categories}
                     onFilterChange={handleFilterChange}
                     onReset={handleResetFilters}
                 />
@@ -144,18 +149,14 @@ const Products = () => {
                     </div>
 
                     {status === "loading" && <p className="catalog-status">Đang tải sản phẩm...</p>}
-                    {status === "failed" && (
-                        <p className="catalog-error">
-                            {error || "Không thể tải sản phẩm"}.
-                        </p>
-                    )}
+                    {status === "failed" && <p className="catalog-error">{error || "Không thể tải sản phẩm"}.</p>}
 
                     {status === "succeeded" && items.length === 0 && (
                         <p className="catalog-status">Không tìm thấy sản phẩm phù hợp bộ lọc.</p>
                     )}
 
                     <div className="catalog-grid">
-                        {visibleProducts.map((product) => (
+                        {items.map((product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
@@ -173,9 +174,7 @@ const Products = () => {
                             <p className="catalog-subheading">Đồng hồ cao cấp</p>
                             <h2>Gia nhập cộng đồng đồng hồ cao cấp.</h2>
                             <p>
-                                Thưởng thức những bộ sưu tập được chọn lọc, nổi bật với tông màu
-                                đen, vàng và cổ điển hiện đại. Một không gian mua sắm mang cảm giác
-                                như showroom thật.
+                                Thưởng thức những bộ sưu tập được chọn lọc, nổi bật với tông màu đen, vàng và cổ điển hiện đại. Một không gian mua sắm mang cảm giác như showroom thật.
                             </p>
 
                             <div className="catalog-promo-form">

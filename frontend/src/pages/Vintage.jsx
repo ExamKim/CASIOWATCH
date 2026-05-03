@@ -19,6 +19,7 @@ const Vintage = () => {
         dispatch(
             setProductsFilters({
                 category: "Vintage",
+                gender: [],
                 page: 1,
                 limit: 12,
             })
@@ -31,7 +32,23 @@ const Vintage = () => {
 
     const brands = useMemo(() => ["VINTAGE"], [items]);
 
-    const handleFilterChange = (key, value) => {
+    const handleFilterChange = (key, value, checked) => {
+        if (key === "gender") {
+            const current = Array.isArray(filters.gender) ? filters.gender : [];
+            const nextGender = checked
+                ? Array.from(new Set([...current, value]))
+                : current.filter((item) => item !== value);
+
+            dispatch(
+                setProductsFilters({
+                    ...filters,
+                    gender: nextGender,
+                    page: 1,
+                })
+            );
+            return;
+        }
+
         dispatch(setProductsFilters({ [key]: value, page: 1 }));
     };
 
@@ -40,6 +57,7 @@ const Vintage = () => {
             setProductsFilters({
                 q: "",
                 brand: "",
+                gender: [],
                 minPrice: "",
                 maxPrice: "",
                 sort: "",

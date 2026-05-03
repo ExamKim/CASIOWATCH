@@ -200,6 +200,30 @@
     outline: none;
 }
 
+.catalog-filter-checklist {
+    display: grid;
+    gap: 10px;
+}
+
+.catalog-filter-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #111;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.catalog-filter-check input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #d4af37;
+}
+
 .catalog-filter-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -6,6 +6,19 @@ function toNum(v) {
     return Number.isFinite(n) ? n : null;
 }
 
+function normalizeList(value) {
+    if (value == null || value === "") return [];
+
+    if (Array.isArray(value)) {
+        return value.map((item) => String(item).trim()).filter(Boolean);
+    }
+
+    return String(value)
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+}
+
 function orderByFromSort(sort) {
     const map = {
         price_asc: "price ASC",
@@ -16,7 +29,7 @@ function orderByFromSort(sort) {
     return map[sort] || "id DESC";
 }
 
-async function list({ q, brand, category, minPrice, maxPrice, sort, page = 1, limit = 12 }) {
+async function list({ q, brand, category, gender, minPrice, maxPrice, sort, page = 1, limit = 12 }) {
     const _page = Math.max(1, Number(page) || 1);
     const _limit = Math.max(1, Math.min(100, Number(limit) || 12));
     const offset = (_page - 1) * _limit;
@@ -39,13 +52,23 @@ async function list({ q, brand, category, minPrice, maxPrice, sort, page = 1, li
         params.push(String(category).trim());
     }
 
+    const genders = normalizeList(gender);
+    if (genders.length > 0) {
+        where.push(`gender IN (${genders.map(() => "?").join(", ")})`);
+        params.push(...genders);
+    }
+
     const min = toNum(minPrice);
     const max = toNum(maxPrice);
-    if (min != null) {
+    if (min != null && max != null) {
+        const low = Math.min(min, max);
+        const high = Math.max(min, max);
+        where.push("price BETWEEN ? AND ?");
+        params.push(low, high);
+    } else if (min != null) {
         where.push("price >= ?");
         params.push(min);
-    }
-    if (max != null) {
+    } else if (max != null) {
         where.push("price <= ?");
         params.push(max);
     }
