@@ -6,6 +6,7 @@ const roleMiddleware = require("../middlewares/roleMiddleware");
 const router = express.Router();
 const {
     getAllProducts,
+    getProductCategories,
     getProductById,
     createProduct,
     updateProduct,
@@ -15,6 +16,7 @@ const {
 
 router.get("/", getAllProducts);
 router.get("/sale", getSaleProducts);
+router.get("/categories", getProductCategories);
 router.get("/:id", getProductById);
 
 // admin CRUD

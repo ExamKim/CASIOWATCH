@@ -27,6 +27,7 @@ const productsApi = {
         const query = buildQueryString(params);
         return axiosClient.get(query ? `/products?${query}` : "/products");
     },
+    getCategories: () => axiosClient.get("/products/categories"),
     getProductById: (id) => axiosClient.get(`/products/${id}`),
     createProduct: (payload) => axiosClient.post("/products", payload),
     updateProduct: (id, payload) => axiosClient.put(`/products/${id}`, payload),

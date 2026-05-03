@@ -157,4 +157,12 @@ async function listSale() {
     return rows;
 }
 
-module.exports = { list, findById, create, update, remove, listSale };
+async function listCategories() {
+    const [rows] = await pool.query(
+        "SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category <> '' ORDER BY category ASC"
+    );
+
+    return rows.map((row) => row.category);
+}
+
+module.exports = { list, findById, create, update, remove, listSale, listCategories };

@@ -2,6 +2,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../store/authSlice';
+import productsApi from '../api/productsApi';
 import '../styles/header.css';
 
 const HeaderIcon = ({ name }) => {
@@ -63,11 +64,24 @@ const HeaderIcon = ({ name }) => {
   }
 };
 
+const FALLBACK_CATEGORIES = ['G-Shock', 'Baby-G', 'Edifice', 'Vintage', 'Classic', 'G-SQUAD', 'SHEEN', 'PRO TREK'];
+
+const buildCategoryRoute = (category) => {
+  const normalized = String(category || '').trim();
+
+  if (normalized === 'G-Shock') return '/g-shock';
+  if (normalized === 'Baby-G') return '/baby-g';
+  if (normalized === 'Edifice') return '/edifice';
+
+  return `/products?category=${encodeURIComponent(normalized)}`;
+};
+
 const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, token } = useSelector(state => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
   const dropdownRef = useRef(null);
 
   const handleLogout = () => {
@@ -89,11 +103,36 @@ const Header = () => {
     }
   }, [isDropdownOpen]);
 
-  const categoryLinks = [
-    { label: 'G-SHOCK', to: '/g-shock' },
-    { label: 'BABY-G', to: '/baby-g' },
-    { label: 'EDIFICE', to: '/edifice' },
-  ];
+  useEffect(() => {
+    let mounted = true;
+
+    const loadCategories = async () => {
+      try {
+        const response = await productsApi.getCategories();
+        const apiCategories = Array.isArray(response?.data?.data) ? response.data.data : [];
+
+        if (mounted && apiCategories.length > 0) {
+          setCategories(apiCategories);
+        }
+      } catch (error) {
+        if (mounted) {
+          setCategories(FALLBACK_CATEGORIES);
+        }
+      }
+    };
+
+    loadCategories();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const categoryLinks = categories.map((category) => ({
+    label: category,
+    to: buildCategoryRoute(category),
+    value: category,
+  }));
 
   const mainLinks = [
     { label: 'TRANG CHỦ', to: '/' },
@@ -158,9 +197,11 @@ const Header = () => {
           <div className="search-wrap" role="search">
             <select className="search-category" defaultValue="ALL" aria-label="Product category">
               <option value="ALL">TẤT CẢ</option>
-              <option value="GSHOCK">G-SHOCK</option>
-              <option value="BABYG">BABY-G</option>
-              <option value="EDIFICE">EDIFICE</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
             </select>
 
             <input

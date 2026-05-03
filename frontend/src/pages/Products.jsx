@@ -1,9 +1,11 @@
 ﻿import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 import Filters from "../components/Filters";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 import SiteFooter from "../components/SiteFooter";
+import productsApi from "../api/productsApi";
 import { fetchProductsThunk, setProductsFilters, setProductsPage } from "../store/productSlice";
 import "../styles/catalog.css";
 
@@ -18,25 +20,52 @@ const DEFAULT_FILTERS = {
     limit: 12,
 };
 
-const STATIC_CATEGORIES = ["G-Shock", "Edifice", "Baby-G", "Vintage", "Classic", "G-SQUAD", "SHEEN", "PRO TREK"];
+const getInitialFilters = (search) => {
+    const params = new URLSearchParams(search);
+    const category = params.get("category") || "";
+
+    return {
+        ...DEFAULT_FILTERS,
+        category,
+    };
+};
 
 const Products = () => {
     const dispatch = useDispatch();
+    const location = useLocation();
+    const [categories, setCategories] = React.useState([]);
     const { items, pagination, filters, status, error } = useSelector((state) => state.products);
 
     useEffect(() => {
-        dispatch(setProductsFilters(DEFAULT_FILTERS));
-        dispatch(fetchProductsThunk(DEFAULT_FILTERS));
-    }, [dispatch]);
+        const initialFilters = getInitialFilters(location.search);
+        dispatch(setProductsFilters(initialFilters));
+        dispatch(fetchProductsThunk(initialFilters));
+    }, [dispatch, location.search]);
 
-    const categories = useMemo(() => {
-        const fromData = items
-            .map((item) => item?.category)
-            .filter(Boolean)
-            .map((category) => String(category).trim());
+    useEffect(() => {
+        let mounted = true;
 
-        return Array.from(new Set([...STATIC_CATEGORIES, ...fromData]));
-    }, [items]);
+        const loadCategories = async () => {
+            try {
+                const response = await productsApi.getCategories();
+                const apiCategories = Array.isArray(response?.data?.data) ? response.data.data : [];
+
+                if (mounted) {
+                    setCategories(apiCategories);
+                }
+            } catch (error) {
+                if (mounted) {
+                    setCategories([]);
+                }
+            }
+        };
+
+        loadCategories();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     const handleFilterChange = (key, value, checked) => {
         if (key === "gender") {

@@ -3,13 +3,26 @@ import { Link } from 'react-router-dom';
 import productsApi from '../api/productsApi';
 import ProductCard from '../components/ProductCard';
 import SiteFooter from '../components/SiteFooter';
+import { getProductImage } from '../utils/productImage';
 import '../styles/Home.css';
+
+const FALLBACK_CATEGORIES = ['G-Shock', 'Baby-G', 'Edifice', 'Vintage', 'Classic', 'G-SQUAD', 'SHEEN', 'PRO TREK'];
+
+const buildCategoryHref = (category) => {
+    const normalized = String(category || '').trim();
+
+    if (normalized === 'G-Shock') return '/g-shock';
+    if (normalized === 'Baby-G') return '/baby-g';
+    if (normalized === 'Edifice') return '/edifice';
+
+    return `/products?category=${encodeURIComponent(normalized)}`;
+};
 
 const Home = () => {
     const [featuredProducts, setFeaturedProducts] = useState([]);
     const [status, setStatus] = useState('loading');
     const [error, setError] = useState('');
-    const [categoryImages, setCategoryImages] = useState({});
+    const [categoryCards, setCategoryCards] = useState([]);
 
     useEffect(() => {
         let mounted = true;
@@ -33,27 +46,40 @@ const Home = () => {
 
         const loadCategoryImages = async () => {
             try {
-                // map label -> category value in DB
-                const cats = [
-                    { key: 'gshock', category: 'G-Shock' },
-                    { key: 'baby-g', category: 'Baby-G' },
-                    { key: 'edifice', category: 'Edifice' },
-                ];
+                const response = await productsApi.getCategories();
+                const apiCategories = Array.isArray(response?.data?.data) ? response.data.data : [];
+                const categories = apiCategories.length > 0 ? apiCategories : FALLBACK_CATEGORIES;
 
-                const results = await Promise.all(
-                    cats.map((c) => productsApi.getProducts({ category: c.category, page: 1, limit: 1 }))
+                const cards = await Promise.all(
+                    categories.map(async (category) => {
+                        try {
+                            const res = await productsApi.getProducts({ category, page: 1, limit: 1 });
+                            const item = res?.data?.data?.[0];
+
+                            return {
+                                label: category,
+                                href: buildCategoryHref(category),
+                                image: item ? getProductImage(item) : '/img/login1.jpg',
+                            };
+                        } catch (err) {
+                            return {
+                                label: category,
+                                href: buildCategoryHref(category),
+                                image: '/img/login1.jpg',
+                            };
+                        }
+                    })
                 );
 
-                const images = {};
-                results.forEach((res, idx) => {
-                    const c = cats[idx];
-                    const item = res?.data?.data?.[0];
-                    images[c.key] = item?.image_url || '/img/login1.jpg';
-                });
-
-                setCategoryImages(images);
+                setCategoryCards(cards);
             } catch (err) {
-                // ignore, keep defaults
+                setCategoryCards(
+                    FALLBACK_CATEGORIES.map((category) => ({
+                        label: category,
+                        href: buildCategoryHref(category),
+                        image: '/img/login1.jpg',
+                    }))
+                );
             }
         };
 
@@ -105,18 +131,12 @@ const Home = () => {
 
             <section className="home-categories">
                 <div className="home-category-grid">
-                    <Link to="/g-shock" className="home-category-card gshock">
-                        <img src={categoryImages['gshock'] || '/img/login1.jpg'} alt="G-SHOCK" />
-                        <span>G-SHOCK</span>
-                    </Link>
-                    <Link to="/baby-g" className="home-category-card babyg">
-                        <img src={categoryImages['baby-g'] || '/img/login1.jpg'} alt="BABY-G" />
-                        <span>BABY-G</span>
-                    </Link>
-                    <Link to="/edifice" className="home-category-card edifice">
-                        <img src={categoryImages['edifice'] || '/img/login1.jpg'} alt="EDIFICE" />
-                        <span>EDIFICE</span>
-                    </Link>
+                    {categoryCards.map((category) => (
+                        <Link key={category.label} to={category.href} className="home-category-card">
+                            <img src={category.image} alt={category.label} />
+                            <span>{category.label}</span>
+                        </Link>
+                    ))}
                 </div>
             </section>
 
