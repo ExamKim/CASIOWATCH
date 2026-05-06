@@ -97,7 +97,7 @@ const Home = () => {
                 <div className="home-hero-overlay" />
                 <div className="home-hero-inner">
                     <div className="home-hero-copy">
-                        <p className="home-kicker">Nghệ thuật của thời gian</p>
+                        <p className="home-kicker">Casio</p>
                         <h1>
                             NGHỆ THUẬT CỦA <br />
                             THỜI GIAN.
@@ -117,11 +117,9 @@ const Home = () => {
                         </div>
                     </div>
 
-                    <div className="home-hero-visual">
-                        <div className="home-hero-watch-frame">
-                            <img src="/img/login1.jpg" alt="G-SHOCK premium watch" />
-                        </div>
-                        <div className="home-hero-tag">
+                    <div className="catalog-hero-panel">
+                        <img src="/img/login1.jpg" alt="G-SHOCK premium watch" />
+                        <div className="catalog-hero-panel-copy">
                             <span>MR-G SERIES</span>
                             <strong>Gold collection</strong>
                         </div>
