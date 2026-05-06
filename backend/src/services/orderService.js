@@ -64,13 +64,6 @@ async function getMyOrders(userId) {
     return rows;
 }
 
-async function getAllOrders() {
-    const [rows] = await pool.query(
-        "SELECT * FROM orders ORDER BY created_at DESC, id DESC"
-    );
-    return rows;
-}
-
 async function getOrderDetail(orderId) {
     const [[order]] = await pool.query("SELECT * FROM orders WHERE id = ?", [orderId]);
     if (!order) return null;
@@ -83,23 +76,8 @@ async function getOrderDetail(orderId) {
     return { ...order, items };
 }
 
-async function updateOrderStatus(orderId, status) {
-    const [result] = await pool.query(
-        "UPDATE orders SET status = ? WHERE id = ?",
-        [status, orderId]
-    );
-
-    if (result.affectedRows === 0) {
-        return null;
-    }
-
-    return getOrderDetail(orderId);
-}
-
 module.exports = {
     createOrderFromCart,
     getMyOrders,
-    getAllOrders,
     getOrderDetail,
-    updateOrderStatus,
 };

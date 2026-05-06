@@ -54,14 +54,14 @@ const Register = () => {
     }
 
     try {
-      const result = await dispatch(registerThunk({
+      const action = await dispatch(registerThunk({
         username: formData.username,
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
         address: formData.address,
       }));
-      if (result.payload) {
+      if (registerThunk.fulfilled.match(action)) {
         navigate('/');
       }
     } catch (err) {

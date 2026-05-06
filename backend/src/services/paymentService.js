@@ -78,29 +78,6 @@ async function createQRPayment({ orderId, userId }) {
   return { note, qrContent };
 }
 
-// Admin confirm payment
-async function confirmPayment({ orderId }) {
-  const order = await getOrderById(orderId);
-  if (!order) {
-    const err = new Error("Order not found");
-    err.status = 404;
-    throw err;
-  }
-
-  if (order.payment_status === "paid") return order;
-
-  await pool.query(
-    `UPDATE orders
-     SET payment_status = 'paid',
-         paid_at = NOW(),
-         status = 'processing'
-     WHERE id = ?`,
-    [orderId]
-  );
-
-  return getOrderById(orderId);
-}
-
 // Card stub simulate
 async function simulateCardPayment({ orderId, userId, result }) {
   ensureAllowedStatus(result, ["success", "fail"]);
@@ -142,13 +119,11 @@ async function simulateCardPayment({ orderId, userId, result }) {
 console.log('Exporting paymentService:', {
   setCODPayment,
   createQRPayment,
-  confirmPayment,
   simulateCardPayment,
 });
 
 module.exports = {
   setCODPayment,
   createQRPayment,
-  confirmPayment,
   simulateCardPayment,
 };

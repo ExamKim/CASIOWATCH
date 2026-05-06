@@ -7,8 +7,6 @@ const paymentApi = {
         axiosClient.post('/payments/qr', { orderId }),
     simulateCard: (orderId, result) =>
         axiosClient.get(`/payments/card/${orderId}/simulate`, { params: { result } }),
-    adminConfirm: (orderId) =>
-        axiosClient.put(`/payments/orders/${orderId}/confirm-payment`),
 };
 
 export default paymentApi;

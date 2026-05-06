@@ -20,7 +20,6 @@ import MyOrders from './pages/MyOrders';
 import OrderDetail from './pages/OrderDetail';
 import Payment from './pages/Payment';
 import OrderSuccess from './pages/OrderSuccess';
-import AdminOrders from './pages/AdminOrders';
 import AdminProducts from './pages/AdminProducts';
 import GShock from './pages/GShock';
 import Edifice from './pages/Edifice';
@@ -63,7 +62,6 @@ function App() {
           <Route path="/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
           <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
 
-          <Route path="/admin/orders" element={<ProtectedRoute requireAdmin><AdminOrders /></ProtectedRoute>} />
           <Route path="/admin/products" element={<ProtectedRoute requireAdmin><AdminProducts /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

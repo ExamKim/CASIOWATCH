@@ -2,19 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ordersApi from "../api/ordersApi";
 import { normalizeApiError } from "../utils/apiError";
 
-// Admin - Get all orders
-export const fetchOrdersThunk = createAsyncThunk(
-    "orders/fetchOrders",
-    async (filters, { rejectWithValue }) => {
-        try {
-            const res = await ordersApi.getOrders(filters);
-            return res.data;
-        } catch (err) {
-            return rejectWithValue({ message: normalizeApiError(err, "Fetch orders failed") });
-        }
-    }
-);
-
 // User - Get my orders
 export const fetchMyOrdersThunk = createAsyncThunk(
     "orders/fetchMyOrders",
@@ -54,33 +41,7 @@ export const createOrderThunk = createAsyncThunk(
     }
 );
 
-// Admin - Update order status
-export const updateOrderStatusThunk = createAsyncThunk(
-    "orders/updateOrderStatus",
-    async ({ orderId, status }, { rejectWithValue }) => {
-        try {
-            const res = await ordersApi.updateOrderStatus(orderId, status);
-            return res.data;
-        } catch (err) {
-            return rejectWithValue({ message: normalizeApiError(err, "Update order status failed") });
-        }
-    }
-);
-
-export const confirmOrderPaymentThunk = createAsyncThunk(
-    "orders/confirmOrderPayment",
-    async (orderId, { rejectWithValue }) => {
-        try {
-            const res = await ordersApi.confirmOrderPayment(orderId);
-            return res.data?.order || res.data;
-        } catch (err) {
-            return rejectWithValue({ message: normalizeApiError(err, "Confirm payment failed") });
-        }
-    }
-);
-
 const initialState = {
-    allOrders: [],
     myOrders: [],
     currentOrder: null,
     pagination: { page: 1, limit: 12, total: 0, totalPages: 0 },
@@ -101,21 +62,6 @@ const ordersSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // fetchOrdersThunk (admin)
-        builder
-            .addCase(fetchOrdersThunk.pending, (state) => {
-                state.status = "loading";
-                state.error = null;
-            })
-            .addCase(fetchOrdersThunk.fulfilled, (state, action) => {
-                state.status = "succeeded";
-                state.allOrders = action.payload || [];
-            })
-            .addCase(fetchOrdersThunk.rejected, (state, action) => {
-                state.status = "failed";
-                state.error = action.payload?.message || "Fetch orders failed";
-            });
-
         // fetchMyOrdersThunk (user)
         builder
             .addCase(fetchMyOrdersThunk.pending, (state) => {
@@ -160,48 +106,6 @@ const ordersSlice = createSlice({
             .addCase(createOrderThunk.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload?.message || "Create order failed";
-            });
-
-        // updateOrderStatusThunk
-        builder
-            .addCase(updateOrderStatusThunk.pending, (state) => {
-                state.status = "loading";
-                state.error = null;
-            })
-            .addCase(updateOrderStatusThunk.fulfilled, (state, action) => {
-                state.status = "succeeded";
-                const updatedOrder = action.payload;
-                // Update in allOrders
-                const allIndex = state.allOrders.findIndex(o => o.id === updatedOrder.id);
-                if (allIndex !== -1) {
-                    state.allOrders[allIndex] = updatedOrder;
-                }
-                // Update current order if viewing
-                if (state.currentOrder?.id === updatedOrder.id) {
-                    state.currentOrder = updatedOrder;
-                }
-            })
-            .addCase(updateOrderStatusThunk.rejected, (state, action) => {
-                state.status = "failed";
-                state.error = action.payload?.message || "Update order status failed";
-            })
-
-            .addCase(confirmOrderPaymentThunk.pending, (state) => {
-                state.status = "loading";
-                state.error = null;
-            })
-            .addCase(confirmOrderPaymentThunk.fulfilled, (state, action) => {
-                state.status = "succeeded";
-                const updatedOrder = action.payload;
-                const allIndex = state.allOrders.findIndex((o) => o.id === updatedOrder.id);
-                if (allIndex !== -1) state.allOrders[allIndex] = updatedOrder;
-                const myIndex = state.myOrders.findIndex((o) => o.id === updatedOrder.id);
-                if (myIndex !== -1) state.myOrders[myIndex] = updatedOrder;
-                if (state.currentOrder?.id === updatedOrder.id) state.currentOrder = updatedOrder;
-            })
-            .addCase(confirmOrderPaymentThunk.rejected, (state, action) => {
-                state.status = "failed";
-                state.error = action.payload?.message || "Confirm payment failed";
             });
     },
 });

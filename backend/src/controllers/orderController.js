@@ -40,39 +40,3 @@ exports.getOrderById = async (req, res, next) => {
         next(err);
     }
 };
-
-exports.getAllOrders = async (req, res, next) => {
-    try {
-        const orders = await orderService.getAllOrders();
-        res.json(orders);
-    } catch (err) {
-        next(err);
-    }
-};
-
-exports.updateOrderStatus = async (req, res, next) => {
-    try {
-        const orderId = Number(req.params.id);
-        if (!Number.isInteger(orderId) || orderId <= 0) {
-            return res.status(400).json({ message: "Invalid order id" });
-        }
-
-        const status = String(req.body?.status || "").trim().toLowerCase();
-        const allowedStatuses = ["pending", "processing", "shipped", "completed", "cancelled"];
-
-        if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({
-                message: "status must be one of: pending, processing, shipped, completed, cancelled",
-            });
-        }
-
-        const updated = await orderService.updateOrderStatus(orderId, status);
-        if (!updated) {
-            return res.status(404).json({ message: "Order not found" });
-        }
-
-        res.json(updated);
-    } catch (err) {
-        next(err);
-    }
-};

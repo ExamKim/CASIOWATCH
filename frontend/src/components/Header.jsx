@@ -23,13 +23,6 @@ const HeaderIcon = ({ name }) => {
           <path d="M8 12h8" />
         </svg>
       );
-    case 'admin':
-      return (
-        <svg viewBox="0 0 24 24" className="header-icon-svg" aria-hidden="true">
-          <path d="M12 2l2.1 4.3 4.7.7-3.4 3.3.8 4.7L12 13.8 7.8 15l.8-4.7L5.2 7l4.7-.7z" />
-          <path d="M12 13v9" />
-        </svg>
-      );
     case 'cart':
       return (
         <svg viewBox="0 0 24 24" className="header-icon-svg" aria-hidden="true">
@@ -220,12 +213,6 @@ const Header = () => {
             {token && user && (
               <Link to="/my-orders" className="icon-btn" aria-label="My orders">
                 <HeaderIcon name="orders" />
-              </Link>
-            )}
-
-            {token && user?.role === 'admin' && (
-              <Link to="/admin/orders" className="icon-btn" aria-label="Admin orders">
-                <HeaderIcon name="admin" />
               </Link>
             )}
 

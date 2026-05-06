@@ -34,17 +34,6 @@ exports.createQR = async (req, res, next) => {
     }
 };
 
-// Admin confirm payment cho order
-exports.confirmOrderPayment = async (req, res, next) => {
-    try {
-        const orderId = Number(req.params.id);
-        const order = await paymentService.confirmPayment({ orderId });
-        res.json({ message: "Payment confirmed", order });
-    } catch (err) {
-        next(err);
-    }
-};
-
 // Card stub simulate
 exports.simulateCard = async (req, res, next) => {
     try {
