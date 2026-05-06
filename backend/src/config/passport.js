@@ -22,6 +22,7 @@ if (GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET) {
 
             let user = await userService.findByEmail(email);
             if (!user) {
+                // OAuth users have NULL password_hash (they authenticate via OAuth, not email/password)
                 user = await userService.createUser({ username, email, passwordHash: null });
             }
             return done(null, user);
@@ -45,6 +46,7 @@ if (FACEBOOK_APP_ID && FACEBOOK_APP_SECRET) {
 
             let user = await userService.findByEmail(email);
             if (!user) {
+                // OAuth users have NULL password_hash (they authenticate via OAuth, not email/password)
                 user = await userService.createUser({ username, email, passwordHash: null });
             }
             return done(null, user);

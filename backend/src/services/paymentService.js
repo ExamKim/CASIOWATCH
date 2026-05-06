@@ -30,6 +30,17 @@ async function getOrderById(orderId) {
   return order || null;
 }
 
+function assertOrderPayable(order) {
+  const orderStatus = String(order.status || "").toLowerCase();
+  const uncancellableStatuses = ["cancelled", "completed", "delivered"];
+
+  if (uncancellableStatuses.includes(orderStatus)) {
+    const err = new Error(`Cannot accept payment for ${orderStatus} order`);
+    err.status = 400;
+    throw err;
+  }
+}
+
 // COD: user chọn COD cho order
 async function setCODPayment({ orderId, userId }) {
   const order = await getOrderById(orderId);
@@ -40,6 +51,8 @@ async function setCODPayment({ orderId, userId }) {
     err.status = 400;
     throw err;
   }
+
+  assertOrderPayable(order);
 
   await pool.query(
     `UPDATE orders
@@ -63,6 +76,8 @@ async function createQRPayment({ orderId, userId }) {
     err.status = 400;
     throw err;
   }
+
+  assertOrderPayable(order);
 
   const note = `CASIO_${orderId}`;
   const amount = Number(order.total_price || 0);
@@ -102,6 +117,8 @@ async function confirmOnlinePayment({ orderId, userId, method }) {
   if (order.payment_status === "paid") {
     return order;
   }
+
+  assertOrderPayable(order);
 
   const paymentMethod = normalizedMethod === "momo" ? "MOMO" : normalizedMethod.toUpperCase();
 

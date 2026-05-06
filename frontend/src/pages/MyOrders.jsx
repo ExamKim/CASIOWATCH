@@ -32,7 +32,8 @@ export default function MyOrders() {
 
     const canCancel = (order) => {
         const statusValue = String(order.status || "").toLowerCase();
-        return !["cancelled", "completed", "delivered"].includes(statusValue);
+        const paymentStatusValue = String(order.payment_status || "").toLowerCase();
+        return !["cancelled", "completed", "delivered"].includes(statusValue) && paymentStatusValue !== "paid";
     };
 
     const handleCancel = async (orderId) => {

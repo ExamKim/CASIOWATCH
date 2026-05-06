@@ -54,6 +54,10 @@ exports.login = async (req, res, next) => {
             return res.status(401).json({ message: "Invalid email or password" });
         }
 
+        if (!user.password_hash) {
+            return res.status(401).json({ message: "This account uses OAuth login. Please use Google or Facebook to sign in." });
+        }
+
         const ok = await bcrypt.compare(password, user.password_hash);
         if (!ok) {
             return res.status(401).json({ message: "Invalid email or password" });

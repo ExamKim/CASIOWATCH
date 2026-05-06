@@ -5,6 +5,7 @@ import { createOrderThunk } from "../store/ordersSlice";
 import { fetchCartThunk } from "../store/cartSlice";
 import { addToast } from "../store/uiSlice";
 import { getProductImage } from "../utils/productImage";
+import paymentApi from "../api/paymentApi";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/catalog.css";
 
@@ -154,7 +155,16 @@ const Checkout = () => {
             dispatch(addToast({ type: "success", message: "Tạo đơn hàng thành công" }));
 
             if (formData.paymentMethod === "cod") {
-                navigate(`/order-success?orderId=${order?.id}`);
+                try {
+                    await paymentApi.payCOD(order?.id);
+                    navigate(`/order-success?orderId=${order?.id}`);
+                } catch (codError) {
+                    const codErrorMsg = typeof codError === "string"
+                        ? codError
+                        : (codError?.message || codError?.error || "Lỗi khi xác nhận COD");
+                    setMessage(codErrorMsg);
+                    dispatch(addToast({ type: "error", message: codErrorMsg }));
+                }
                 return;
             }
 
