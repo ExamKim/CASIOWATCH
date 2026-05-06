@@ -1,6 +1,5 @@
-﻿import React from "react";
-import { Link } from "react-router-dom";
-import { useLocation, useNavigate } from "react-router-dom";
+﻿import React, { useMemo } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import cartApi from "../api/cartApi";
 import { fetchCartThunk } from "../store/cartSlice";
@@ -21,7 +20,8 @@ const ProductCard = ({ product }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { token } = useSelector((state) => state.auth);
-    const baseImage = getProductImage(product);
+
+    const baseImage = useMemo(() => getProductImage(product), [product]);
     const isOnSale = Number(product?.sale_price) > 0 && Number(product?.sale_price) < Number(product?.price);
 
     const addToCart = async () => {
@@ -58,10 +58,26 @@ const ProductCard = ({ product }) => {
     };
 
     const handleBuyNow = async () => {
-        const success = await addToCart();
-        if (success !== false) {
-            navigate("/checkout");
+        if (!token) {
+            dispatch(addToast({ type: "info", message: "Vui lòng đăng nhập để mua hàng" }));
+            navigate("/login", {
+                state: {
+                    from: location.pathname + location.search,
+                    message: "Vui lòng đăng nhập để tiếp tục",
+                },
+            });
+            return;
         }
+
+        const productId = Number(product?.id);
+        navigate(`/checkout${Number.isInteger(productId) && productId > 0 ? `?buyNowProductId=${productId}` : ""}`, {
+            state: {
+                buyNowProduct: {
+                    ...product,
+                    quantity: 1,
+                },
+            },
+        });
     };
 
     const handleAddToCart = async () => {
@@ -116,4 +132,3 @@ const ProductCard = ({ product }) => {
 };
 
 export default ProductCard;
-

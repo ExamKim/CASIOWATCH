@@ -1,7 +1,8 @@
-﻿import React, { useEffect } from "react";
+﻿import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchMyOrdersThunk } from "../store/ordersSlice";
+import { cancelOrderThunk, fetchMyOrdersThunk } from "../store/ordersSlice";
+import { addToast } from "../store/uiSlice";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/orders.css";
 
@@ -20,10 +21,31 @@ function statusClass(status) {
 export default function MyOrders() {
     const dispatch = useDispatch();
     const { myOrders, status, error } = useSelector((state) => state.orders);
+    const [cancellingId, setCancellingId] = useState(null);
 
     useEffect(() => {
         dispatch(fetchMyOrdersThunk());
     }, [dispatch]);
+
+    const canPay = (order) => ["pending", "failed", "unpaid", "cancelled"].includes(String(order.payment_status || "").toLowerCase())
+        && String(order.status || "").toLowerCase() !== "cancelled";
+
+    const canCancel = (order) => {
+        const statusValue = String(order.status || "").toLowerCase();
+        return !["cancelled", "completed", "delivered"].includes(statusValue);
+    };
+
+    const handleCancel = async (orderId) => {
+        try {
+            setCancellingId(orderId);
+            await dispatch(cancelOrderThunk(orderId)).unwrap();
+            dispatch(addToast({ type: "success", message: `Đã hủy đơn #${orderId}` }));
+        } catch (err) {
+            dispatch(addToast({ type: "error", message: err?.message || "Không thể hủy đơn hàng" }));
+        } finally {
+            setCancellingId(null);
+        }
+    };
 
     return (
         <div className="orders-page">
@@ -67,8 +89,18 @@ export default function MyOrders() {
                                 </div>
                                 <div className="order-card-actions">
                                     <Link to={`/orders/${order.id}`} className="orders-outline-btn">Chi tiết</Link>
-                                    {(order.payment_status === "pending" || order.payment_status === "failed" || !order.payment_status) && (
+                                    {canPay(order) && (
                                         <Link to={`/payment?orderId=${order.id}`} className="orders-primary-btn">Thanh toán</Link>
+                                    )}
+                                    {canCancel(order) && (
+                                        <button
+                                            type="button"
+                                            className="orders-outline-btn"
+                                            disabled={cancellingId === order.id}
+                                            onClick={() => handleCancel(order.id)}
+                                        >
+                                            {cancellingId === order.id ? "Đang hủy..." : "Hủy đơn"}
+                                        </button>
                                     )}
                                 </div>
                             </article>
@@ -81,4 +113,3 @@ export default function MyOrders() {
         </div>
     );
 }
-

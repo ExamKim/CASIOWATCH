@@ -1,5 +1,9 @@
 const { pool } = require("../config/db");
 
+const QR_BANK_CODE = process.env.QR_BANK_CODE || "MB";
+const QR_ACCOUNT_NO = process.env.QR_ACCOUNT_NO || "0979605453";
+const QR_ACCOUNT_NAME = process.env.QR_ACCOUNT_NAME || "CHIU KIM THI";
+
 function ensureAllowedStatus(status, allowed) {
   if (!allowed.includes(status)) {
     const err = new Error(`Invalid status. Allowed: ${allowed.join(", ")}`);
@@ -61,8 +65,9 @@ async function createQRPayment({ orderId, userId }) {
   }
 
   const note = `CASIO_${orderId}`;
-  // demo content (bạn thay bằng payload ngân hàng thật nếu cần)
-  const qrContent = `BANK_TRANSFER|AMOUNT=${order.total_price}|NOTE=${note}`;
+  const amount = Number(order.total_price || 0);
+  const qrContent = `BANK_TRANSFER|BANK=${QR_BANK_CODE}|ACCOUNT=${QR_ACCOUNT_NO}|AMOUNT=${amount}|NOTE=${note}`;
+  const qrImageUrl = `https://img.vietqr.io/image/${encodeURIComponent(QR_BANK_CODE)}-${encodeURIComponent(QR_ACCOUNT_NO)}-compact2.png?amount=${encodeURIComponent(amount)}&addInfo=${encodeURIComponent(note)}&accountName=${encodeURIComponent(QR_ACCOUNT_NAME)}`;
 
   await pool.query(
     `UPDATE orders
@@ -75,7 +80,42 @@ async function createQRPayment({ orderId, userId }) {
     [note, qrContent, orderId]
   );
 
-  return { note, qrContent };
+  return {
+    note,
+    qrContent,
+    qrImageUrl,
+    amount,
+    bankCode: QR_BANK_CODE,
+    accountNo: QR_ACCOUNT_NO,
+    accountName: QR_ACCOUNT_NAME,
+  };
+}
+
+async function confirmOnlinePayment({ orderId, userId, method }) {
+  const allowedMethods = ["qr", "momo", "card"];
+  const normalizedMethod = String(method || "").trim().toLowerCase();
+  ensureAllowedStatus(normalizedMethod, allowedMethods);
+
+  const order = await getOrderById(orderId);
+  await assertOrderOwned(order, userId);
+
+  if (order.payment_status === "paid") {
+    return order;
+  }
+
+  const paymentMethod = normalizedMethod === "momo" ? "MOMO" : normalizedMethod.toUpperCase();
+
+  await pool.query(
+    `UPDATE orders
+     SET payment_method = ?,
+         payment_status = 'paid',
+         paid_at = NOW(),
+         status = 'processing'
+     WHERE id = ?`,
+    [paymentMethod, orderId]
+  );
+
+  return getOrderById(orderId);
 }
 
 // Card stub simulate
@@ -119,11 +159,13 @@ async function simulateCardPayment({ orderId, userId, result }) {
 console.log('Exporting paymentService:', {
   setCODPayment,
   createQRPayment,
+  confirmOnlinePayment,
   simulateCardPayment,
 });
 
 module.exports = {
   setCODPayment,
   createQRPayment,
+  confirmOnlinePayment,
   simulateCardPayment,
 };

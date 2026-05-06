@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrderThunk } from "../store/ordersSlice";
 import { fetchCartThunk } from "../store/cartSlice";
@@ -21,20 +21,34 @@ const Checkout = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchParams] = useSearchParams();
     const { items: cartItems } = useSelector((state) => state.cart);
+    const { user } = useSelector((state) => state.auth);
     const [status, setStatus] = useState("idle");
     const [message, setMessage] = useState("");
     const [formData, setFormData] = useState({
-        fullName: "Nguyen Van A",
-        phone: "090 123 4567",
-        email: "email@casio-luxury.vn",
-        address: "52 Tran Hung Dao, Quan 1, Ho Chi Minh",
-        paymentMethod: "cod",
+        fullName: "",
+        phone: "",
+        email: "",
+        address: "",
+        paymentMethod: "qr",
     });
 
     useEffect(() => {
         dispatch(fetchCartThunk());
     }, [dispatch]);
+
+    useEffect(() => {
+        if (!user) return;
+
+        setFormData((prev) => ({
+            ...prev,
+            fullName: user.username || user.fullName || prev.fullName,
+            email: user.email || prev.email,
+            phone: user.phone || prev.phone,
+            address: user.address || prev.address,
+        }));
+    }, [user]);
 
     const selectedProductIds = useMemo(() => {
         const ids = Array.isArray(location.state?.selectedProductIds)
@@ -45,13 +59,33 @@ const Checkout = () => {
             .filter((value) => Number.isInteger(value) && value > 0);
     }, [location.state]);
 
+    const buyNowProduct = useMemo(() => {
+        const product = location.state?.buyNowProduct || null;
+        if (!product) return null;
+        return {
+            ...product,
+            quantity: Number(product.quantity || 1),
+        };
+    }, [location.state]);
+
+    const directBuyNowId = useMemo(() => {
+        const fromState = Number(buyNowProduct?.id ?? buyNowProduct?.product_id);
+        if (Number.isInteger(fromState) && fromState > 0) return fromState;
+
+        const fromQuery = Number(searchParams.get("buyNowProductId"));
+        if (Number.isInteger(fromQuery) && fromQuery > 0) return fromQuery;
+
+        return null;
+    }, [buyNowProduct, searchParams]);
+
     const items = useMemo(() => {
         const allItems = Array.isArray(cartItems) ? cartItems : [];
+        if (buyNowProduct) return [buyNowProduct];
         if (selectedProductIds.length === 0) return allItems;
 
         const selectedSet = new Set(selectedProductIds);
         return allItems.filter((item) => selectedSet.has(Number(item.product_id)));
-    }, [cartItems, selectedProductIds]);
+    }, [cartItems, selectedProductIds, buyNowProduct]);
 
     const summary = useMemo(() => {
         const subtotal = items.reduce((total, item) => {
@@ -71,6 +105,29 @@ const Checkout = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const paymentMethods = [
+        {
+            value: "qr",
+            title: "QR Code",
+            description: "Quét mã để thanh toán nhanh",
+        },
+        {
+            value: "card",
+            title: "Thẻ",
+            description: "Thanh toán bằng thẻ ATM / Visa / Mastercard",
+        },
+        {
+            value: "momo",
+            title: "MoMo / Ví điện tử",
+            description: "Thanh toán qua MoMo hoặc ví điện tử",
+        },
+        {
+            value: "cod",
+            title: "COD",
+            description: "Thanh toán khi nhận hàng",
+        },
+    ];
+
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -78,19 +135,38 @@ const Checkout = () => {
             setStatus("loading");
             setMessage("");
 
-            if (items.length === 0) {
+            if (items.length === 0 && !directBuyNowId) {
                 setMessage("Giỏ hàng đang trống.");
                 setStatus("idle");
                 return;
             }
 
-            const order = await dispatch(createOrderThunk({ selectedProductIds })).unwrap();
-            await dispatch(fetchCartThunk());
+            const createPayload = Number.isInteger(directBuyNowId) && directBuyNowId > 0
+                ? { buyNowProductId: directBuyNowId }
+                : (selectedProductIds.length > 0 ? { selectedProductIds } : {});
+
+            const order = await dispatch(createOrderThunk(createPayload)).unwrap();
+
+            if (!directBuyNowId) {
+                await dispatch(fetchCartThunk());
+            }
 
             dispatch(addToast({ type: "success", message: "Tạo đơn hàng thành công" }));
-            navigate(`/payment?orderId=${order?.id}`);
+
+            if (formData.paymentMethod === "cod") {
+                navigate(`/order-success?orderId=${order?.id}`);
+                return;
+            }
+
+            navigate(`/payment?orderId=${order?.id}`, {
+                state: {
+                    paymentMethod: formData.paymentMethod,
+                },
+            });
         } catch (err) {
-            const content = typeof err === "string" ? err : "Không thể tạo đơn hàng";
+            const content = typeof err === "string"
+                ? err
+                : (err?.message || err?.error || "Không thể tạo đơn hàng");
             setMessage(content);
             dispatch(addToast({ type: "error", message: content }));
         } finally {
@@ -143,33 +219,24 @@ const Checkout = () => {
                         </div>
 
                         <div className="payment-options">
-                            <label className={`payment-option ${formData.paymentMethod === "cod" ? "active" : ""}`}>
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="cod"
-                                    checked={formData.paymentMethod === "cod"}
-                                    onChange={handleChange}
-                                />
-                                <div>
-                                    <strong>COD</strong>
-                                    <span>Thanh toán khi nhận hàng</span>
-                                </div>
-                            </label>
-
-                            <label className={`payment-option ${formData.paymentMethod === "bank" ? "active" : ""}`}>
-                                <input
-                                    type="radio"
-                                    name="paymentMethod"
-                                    value="bank"
-                                    checked={formData.paymentMethod === "bank"}
-                                    onChange={handleChange}
-                                />
-                                <div>
-                                    <strong>Trực tuyến</strong>
-                                    <span>Thanh toán qua ví / thẻ</span>
-                                </div>
-                            </label>
+                            {paymentMethods.map((method) => (
+                                <label
+                                    key={method.value}
+                                    className={`payment-option ${formData.paymentMethod === method.value ? "active" : ""}`}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="paymentMethod"
+                                        value={method.value}
+                                        checked={formData.paymentMethod === method.value}
+                                        onChange={handleChange}
+                                    />
+                                    <div>
+                                        <strong>{method.title}</strong>
+                                        <span>{method.description}</span>
+                                    </div>
+                                </label>
+                            ))}
                         </div>
                     </section>
                 </div>
@@ -179,7 +246,9 @@ const Checkout = () => {
 
                     <div className="checkout-summary-list">
                         {items.length === 0 ? (
-                            <p className="checkout-empty-note">Chưa có sản phẩm nào trong giỏ hàng.</p>
+                            <p className="checkout-empty-note">
+                                {directBuyNowId ? "Đơn mua ngay sẽ được tạo trực tiếp cho sản phẩm đã chọn." : "Chưa có sản phẩm nào trong giỏ hàng."}
+                            </p>
                         ) : (
                             items.map((item) => {
                                 const quantity = Number(item.quantity || 1);
@@ -187,7 +256,7 @@ const Checkout = () => {
                                 const total = quantity * price;
 
                                 return (
-                                    <div className="checkout-summary-item" key={item.product_id}>
+                                    <div className="checkout-summary-item" key={item.product_id || item.id}>
                                         <img
                                             src={getProductImage(item)}
                                             alt={item.name}

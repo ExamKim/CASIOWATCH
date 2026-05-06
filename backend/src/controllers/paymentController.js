@@ -34,6 +34,24 @@ exports.createQR = async (req, res, next) => {
     }
 };
 
+// User xác nhận thanh toán online (QR/MoMo/Thẻ)
+exports.confirmOnline = async (req, res, next) => {
+    try {
+        const userId = req.user?.id;
+        const { orderId, method } = req.body;
+
+        const order = await paymentService.confirmOnlinePayment({
+            orderId: Number(orderId),
+            userId: Number(userId),
+            method: String(method || ""),
+        });
+
+        res.json({ message: "Payment confirmed", order });
+    } catch (err) {
+        next(err);
+    }
+};
+
 // Card stub simulate
 exports.simulateCard = async (req, res, next) => {
     try {

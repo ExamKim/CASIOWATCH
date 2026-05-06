@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import QRPaymentInfo from "../components/QRPaymentInfo";
 import paymentApi from "../api/paymentApi";
@@ -23,10 +23,20 @@ export default function Payment() {
     const orderId = searchParams.get("orderId");
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { currentOrder } = useSelector((state) => state.orders);
     const paymentState = useSelector((state) => state.payment);
-    const [method, setMethod] = useState("qr");
+
+    const paymentMethodFromState = useMemo(() => {
+        const method = location.state?.paymentMethod;
+        if (method && ["qr", "momo", "card"].includes(String(method).toLowerCase())) {
+            return String(method).toLowerCase();
+        }
+        return "qr";
+    }, [location.state]);
+
+    const [method, setMethod] = useState(paymentMethodFromState);
     const [cardLoading, setCardLoading] = useState(false);
 
     useEffect(() => {
@@ -37,19 +47,19 @@ export default function Payment() {
     }, [dispatch, orderId]);
 
     useEffect(() => {
-        if (currentOrder?.payment_method) {
-            const normalized = String(currentOrder.payment_method).toLowerCase();
-            if (["qr", "card", "cod"].includes(normalized)) {
-                setMethod(normalized);
-            }
-        }
-    }, [currentOrder]);
+        setMethod(paymentMethodFromState);
+    }, [paymentMethodFromState]);
 
     const qrData = useMemo(() => {
         if (!paymentState.qr) return null;
         return {
             qrContent: paymentState.qr.qrContent,
             note: paymentState.qr.note,
+            qrImageUrl: paymentState.qr.qrImageUrl,
+            bankCode: paymentState.qr.bankCode,
+            accountNo: paymentState.qr.accountNo,
+            accountName: paymentState.qr.accountName,
+            amount: paymentState.qr.amount,
         };
     }, [paymentState.qr]);
 
@@ -91,6 +101,19 @@ export default function Payment() {
         }
     };
 
+    const handleConfirmOnline = async () => {
+        try {
+            setCardLoading(true);
+            await paymentApi.confirmOnline(Number(orderId), method);
+            dispatch(addToast({ type: "success", message: `Thanh toán ${method} thành công` }));
+            navigate(`/order-success?orderId=${orderId}`);
+        } catch (err) {
+            dispatch(addToast({ type: "error", message: normalizeApiError(err, "Thanh toán thất bại") }));
+        } finally {
+            setCardLoading(false);
+        }
+    };
+
     if (!orderId) {
         return (
             <div className="orders-page">
@@ -116,9 +139,9 @@ export default function Payment() {
                 <div className="payment-card">
                     <h2>Phương thức thanh toán</h2>
                     <div className="payment-method-tabs">
-                        <button type="button" className={method === "qr" ? "active" : ""} onClick={() => setMethod("qr")}>QR</button>
-                        <button type="button" className={method === "card" ? "active" : ""} onClick={() => setMethod("card")}>The</button>
-                        <button type="button" className={method === "cod" ? "active" : ""} onClick={() => setMethod("cod")}>COD</button>
+                        <button type="button" className={method === "qr" ? "active" : ""} onClick={() => setMethod("qr")}>QR Code</button>
+                        <button type="button" className={method === "momo" ? "active" : ""} onClick={() => setMethod("momo")}>MoMo</button>
+                        <button type="button" className={method === "card" ? "active" : ""} onClick={() => setMethod("card")}>Thẻ</button>
                     </div>
 
                     {method === "qr" && (
@@ -127,30 +150,55 @@ export default function Payment() {
                             <button type="button" className="orders-primary-btn" onClick={handleCreateQR} disabled={paymentState.loading}>
                                 {paymentState.loading ? "Đang tạo QR..." : "Tao thong tin QR"}
                             </button>
-                            <QRPaymentInfo qr={qrData?.qrContent} note={qrData?.note} />
+                            <QRPaymentInfo
+                                qr={qrData?.qrContent}
+                                note={qrData?.note}
+                                qrImageUrl={qrData?.qrImageUrl}
+                                bankCode={qrData?.bankCode}
+                                accountNo={qrData?.accountNo}
+                                accountName={qrData?.accountName}
+                                amount={qrData?.amount}
+                            />
+                            <button type="button" className="orders-primary-btn" onClick={handleConfirmOnline} disabled={cardLoading || !qrData?.qrImageUrl}>
+                                {cardLoading ? "Đang xác nhận..." : "Đã thanh toán, xác nhận"}
+                            </button>
+                        </div>
+                    )}
+
+                    {method === "momo" && (
+                        <div className="payment-method-panel">
+                            <p>Sử dụng ứng dụng MoMo để quét mã QR hoặc nhập thông tin để thanh toán.</p>
+                            <div style={{ marginBottom: 16, padding: 16, borderRadius: 8, background: "#f0f0f0" }}>
+                                <strong style={{ display: "block", marginBottom: 8 }}>Thông tin thanh toán MoMo</strong>
+                                <div style={{ fontSize: "14px", color: "#555", lineHeight: 1.6 }}>
+                                    <div><strong>Số tiền:</strong> {formatPrice(currentOrder?.total_price)}</div>
+                                    <div><strong>Nội dung:</strong> CASIO_{orderId}</div>
+                                </div>
+                            </div>
+                            <button type="button" className="orders-primary-btn" onClick={handleConfirmOnline} disabled={cardLoading}>
+                                {cardLoading ? "Đang xác nhận..." : "Đã thanh toán, xác nhận"}
+                            </button>
                         </div>
                     )}
 
                     {method === "card" && (
                         <div className="payment-method-panel">
-                            <p>Mô phỏng kết quả thanh toán thẻ cho demo checkout.</p>
+                            <p>Nhập thông tin thẻ của bạn hoặc sử dụng thẻ được lưu để thanh toán.</p>
+                            <div style={{ marginBottom: 16, padding: 16, borderRadius: 8, background: "#f0f0f0" }}>
+                                <strong style={{ display: "block", marginBottom: 8 }}>Thông tin thanh toán Thẻ</strong>
+                                <div style={{ fontSize: "14px", color: "#555", lineHeight: 1.6 }}>
+                                    <div><strong>Số tiền:</strong> {formatPrice(currentOrder?.total_price)}</div>
+                                    <div><strong>Loại thẻ:</strong> ATM / Visa / Mastercard</div>
+                                </div>
+                            </div>
                             <div className="payment-card-actions">
-                                <button type="button" className="orders-primary-btn" onClick={() => handleCardSimulate("success")} disabled={cardLoading}>
-                                    {cardLoading ? "Đang xử lý..." : "Giả lập thành công"}
+                                <button type="button" className="orders-primary-btn" onClick={handleConfirmOnline} disabled={cardLoading}>
+                                    {cardLoading ? "Đang xác nhận..." : "Đã thanh toán, xác nhận"}
                                 </button>
                                 <button type="button" className="orders-outline-btn" onClick={() => handleCardSimulate("fail")} disabled={cardLoading}>
                                     Giả lập thất bại
                                 </button>
                             </div>
-                        </div>
-                    )}
-
-                    {method === "cod" && (
-                        <div className="payment-method-panel">
-                            <p>Thanh toán tiền mặt khi nhận hàng. Đơn hàng sẽ được xác nhận xử lý.</p>
-                            <button type="button" className="orders-primary-btn" onClick={handleCOD} disabled={paymentState.loading}>
-                                {paymentState.loading ? "Đang xử lý..." : "Xác nhận COD"}
-                            </button>
                         </div>
                     )}
                 </div>

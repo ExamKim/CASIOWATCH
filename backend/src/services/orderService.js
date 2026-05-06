@@ -1,6 +1,7 @@
-const { pool } = require("../config/db");
+﻿const { pool } = require("../config/db");
+const productService = require("./productService");
 
-async function createOrderFromCart(userId, selectedProductIds = []) {
+async function createOrderFromCart(userId, selectedProductIds = [], buyNowProductId = null) {
     const connection = await pool.getConnection();
 
     try {
@@ -22,6 +23,37 @@ async function createOrderFromCart(userId, selectedProductIds = []) {
 
         const hasSelected = selectedIds.length > 0;
         const selectedIdSet = new Set(selectedIds);
+
+        const directProductId = Number(buyNowProductId);
+
+        if (Number.isInteger(directProductId) && directProductId > 0) {
+            const product = await productService.findById(directProductId);
+
+            if (!product) {
+                const err = new Error("Product not found");
+                err.status = 404;
+                throw err;
+            }
+
+            const directPrice = Number(product.sale_price) > 0 && Number(product.sale_price) < Number(product.price)
+                ? Number(product.sale_price)
+                : Number(product.price);
+
+            const [orderResult] = await connection.query(
+                "INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, 'pending')",
+                [userId, directPrice]
+            );
+
+            const orderId = orderResult.insertId;
+
+            await connection.query(
+                "INSERT INTO order_items (order_id, product_id, name, price, quantity) VALUES (?, ?, ?, ?, ?)",
+                [orderId, product.id, product.name, directPrice, 1]
+            );
+
+            await connection.commit();
+            return { id: orderId, status: "pending", total_price: directPrice };
+        }
 
         const finalCartItems = hasSelected
             ? cartItems.filter((item) => selectedIdSet.has(Number(item.product_id)))
@@ -97,8 +129,45 @@ async function getOrderDetail(orderId) {
     return { ...order, items };
 }
 
+async function cancelOrder({ orderId, userId }) {
+    const [[order]] = await pool.query("SELECT * FROM orders WHERE id = ?", [orderId]);
+
+    if (!order) {
+        const err = new Error("Order not found");
+        err.status = 404;
+        throw err;
+    }
+
+    if (Number(order.user_id) !== Number(userId)) {
+        const err = new Error("Forbidden");
+        err.status = 403;
+        throw err;
+    }
+
+    const currentStatus = String(order.status || "").toLowerCase();
+    if (["cancelled", "completed", "delivered"].includes(currentStatus)) {
+        const err = new Error("Order cannot be cancelled");
+        err.status = 400;
+        throw err;
+    }
+
+    await pool.query(
+        `UPDATE orders
+         SET status = 'cancelled',
+             payment_status = CASE
+               WHEN payment_status IS NULL OR payment_status IN ('unpaid', 'pending', 'failed') THEN 'cancelled'
+               ELSE payment_status
+             END
+         WHERE id = ?`,
+        [orderId]
+    );
+
+    return getOrderDetail(orderId);
+}
+
 module.exports = {
     createOrderFromCart,
     getMyOrders,
     getOrderDetail,
+    cancelOrder,
 };

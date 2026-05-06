@@ -1,8 +1,7 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+﻿import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import ordersApi from "../api/ordersApi";
 import { normalizeApiError } from "../utils/apiError";
 
-// User - Get my orders
 export const fetchMyOrdersThunk = createAsyncThunk(
     "orders/fetchMyOrders",
     async (filters, { rejectWithValue }) => {
@@ -15,7 +14,6 @@ export const fetchMyOrdersThunk = createAsyncThunk(
     }
 );
 
-// Get order detail by id
 export const fetchOrderByIdThunk = createAsyncThunk(
     "orders/fetchOrderById",
     async (orderId, { rejectWithValue }) => {
@@ -28,7 +26,6 @@ export const fetchOrderByIdThunk = createAsyncThunk(
     }
 );
 
-// Create order from cart
 export const createOrderThunk = createAsyncThunk(
     "orders/createOrder",
     async (payload = {}, { rejectWithValue }) => {
@@ -37,6 +34,18 @@ export const createOrderThunk = createAsyncThunk(
             return res.data;
         } catch (err) {
             return rejectWithValue({ message: normalizeApiError(err, "Create order failed") });
+        }
+    }
+);
+
+export const cancelOrderThunk = createAsyncThunk(
+    "orders/cancelOrder",
+    async (orderId, { rejectWithValue }) => {
+        try {
+            const res = await ordersApi.cancelOrder(orderId);
+            return res.data?.order || null;
+        } catch (err) {
+            return rejectWithValue({ message: normalizeApiError(err, "Cancel order failed") });
         }
     }
 );
@@ -62,7 +71,6 @@ const ordersSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        // fetchMyOrdersThunk (user)
         builder
             .addCase(fetchMyOrdersThunk.pending, (state) => {
                 state.status = "loading";
@@ -77,7 +85,6 @@ const ordersSlice = createSlice({
                 state.error = action.payload?.message || "Fetch my orders failed";
             });
 
-        // fetchOrderByIdThunk
         builder
             .addCase(fetchOrderByIdThunk.pending, (state) => {
                 state.status = "loading";
@@ -92,7 +99,6 @@ const ordersSlice = createSlice({
                 state.error = action.payload?.message || "Fetch order detail failed";
             });
 
-        // createOrderThunk
         builder
             .addCase(createOrderThunk.pending, (state) => {
                 state.status = "loading";
@@ -106,6 +112,26 @@ const ordersSlice = createSlice({
             .addCase(createOrderThunk.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload?.message || "Create order failed";
+            });
+
+        builder
+            .addCase(cancelOrderThunk.pending, (state) => {
+                state.error = null;
+            })
+            .addCase(cancelOrderThunk.fulfilled, (state, action) => {
+                const updated = action.payload;
+                if (!updated?.id) return;
+
+                state.myOrders = state.myOrders.map((order) =>
+                    Number(order.id) === Number(updated.id) ? { ...order, ...updated } : order
+                );
+
+                if (state.currentOrder && Number(state.currentOrder.id) === Number(updated.id)) {
+                    state.currentOrder = { ...state.currentOrder, ...updated };
+                }
+            })
+            .addCase(cancelOrderThunk.rejected, (state, action) => {
+                state.error = action.payload?.message || "Cancel order failed";
             });
     },
 });

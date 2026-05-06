@@ -1,4 +1,4 @@
-const orderService = require("../services/orderService");
+﻿const orderService = require("../services/orderService");
 
 exports.createOrder = async (req, res, next) => {
     try {
@@ -6,7 +6,8 @@ exports.createOrder = async (req, res, next) => {
         const selectedProductIds = Array.isArray(req.body?.selectedProductIds)
             ? req.body.selectedProductIds
             : [];
-        const created = await orderService.createOrderFromCart(userId, selectedProductIds);
+        const buyNowProductId = Number(req.body?.buyNowProductId);
+        const created = await orderService.createOrderFromCart(userId, selectedProductIds, buyNowProductId);
         res.status(201).json(created);
     } catch (err) {
         next(err);
@@ -39,6 +40,22 @@ exports.getOrderById = async (req, res, next) => {
         }
 
         res.json(order);
+    } catch (err) {
+        next(err);
+    }
+};
+
+exports.cancelOrder = async (req, res, next) => {
+    try {
+        const userId = req.user.id;
+        const orderId = Number(req.params.id);
+
+        if (!Number.isInteger(orderId) || orderId <= 0) {
+            return res.status(400).json({ message: "Invalid order id" });
+        }
+
+        const order = await orderService.cancelOrder({ orderId, userId });
+        res.json({ message: "Order cancelled", order });
     } catch (err) {
         next(err);
     }
