@@ -1,11 +1,12 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import productsApi from "../api/productsApi";
 import cartApi from "../api/cartApi";
 import ProductCard from "../components/ProductCard";
 import SiteFooter from "../components/SiteFooter";
-import { addGuestCartItem } from "../utils/guestCart";
+import { fetchCartThunk } from "../store/cartSlice";
+import { addToast } from "../store/uiSlice";
 import { getProductImage } from "../utils/productImage";
 import "../styles/catalog.css";
 
@@ -19,6 +20,7 @@ function formatPrice(value) {
 }
 
 const ProductDetail = () => {
+    const dispatch = useDispatch();
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -87,22 +89,34 @@ const ProductDetail = () => {
     const shortName = resolvedProduct?.name?.replace(/^Casio\s+/i, "") || resolvedProduct?.name || "Watch";
 
     const handleAddToCart = async () => {
+        if (!token) {
+            dispatch(addToast({ type: "info", message: "Vui lòng đăng nhập để thêm vào giỏ hàng" }));
+            navigate("/login", {
+                state: {
+                    from: location.pathname + location.search,
+                    message: "Vui lòng đăng nhập để tiếp tục",
+                },
+            });
+            return;
+        }
+
         try {
             setIsAdding(true);
-            if (!token) {
-                addGuestCartItem(resolvedProduct, 1);
-            } else {
-                await cartApi.addToCart({ productId: resolvedProduct.id, quantity: 1 });
-            }
-            navigate("/cart");
+            await cartApi.addToCart({ productId: resolvedProduct.id, quantity: 1 });
+            await dispatch(fetchCartThunk());
+            dispatch(addToast({ type: "success", message: "Đã thêm sản phẩm vào giỏ hàng" }));
         } catch (err) {
             if (err?.response?.status === 401) {
-                addGuestCartItem(resolvedProduct, 1);
-                navigate("/cart");
+                navigate("/login", {
+                    state: {
+                        from: location.pathname + location.search,
+                        message: "Vui lòng đăng nhập để tiếp tục",
+                    },
+                });
                 return;
             }
 
-            navigate("/cart");
+            dispatch(addToast({ type: "error", message: "Không thể thêm sản phẩm vào giỏ" }));
         } finally {
             setIsAdding(false);
         }

@@ -1,9 +1,10 @@
 ﻿import React from "react";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import cartApi from "../api/cartApi";
-import { addGuestCartItem } from "../utils/guestCart";
+import { fetchCartThunk } from "../store/cartSlice";
+import { addToast } from "../store/uiSlice";
 import { getProductImage } from "../utils/productImage";
 
 function formatPrice(value) {
@@ -16,36 +17,55 @@ function formatPrice(value) {
 }
 
 const ProductCard = ({ product }) => {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
     const { token } = useSelector((state) => state.auth);
     const baseImage = getProductImage(product);
     const isOnSale = Number(product?.sale_price) > 0 && Number(product?.sale_price) < Number(product?.price);
 
-    const addToCartAndNavigate = async (redirectPath) => {
+    const addToCart = async () => {
+        if (!token) {
+            dispatch(addToast({ type: "info", message: "Vui lòng đăng nhập để thêm vào giỏ hàng" }));
+            navigate("/login", {
+                state: {
+                    from: location.pathname + location.search,
+                    message: "Vui lòng đăng nhập để tiếp tục",
+                },
+            });
+            return false;
+        }
+
         try {
-            if (!token) {
-                addGuestCartItem(product, 1);
-            } else {
-                await cartApi.addToCart({ productId: product.id, quantity: 1 });
-            }
-            navigate(redirectPath);
+            await cartApi.addToCart({ productId: product.id, quantity: 1 });
+            await dispatch(fetchCartThunk());
+            dispatch(addToast({ type: "success", message: "Đã thêm sản phẩm vào giỏ hàng" }));
+            return true;
         } catch (err) {
             if (err?.response?.status === 401) {
-                addGuestCartItem(product, 1);
-                navigate(redirectPath);
-                return;
+                navigate("/login", {
+                    state: {
+                        from: location.pathname + location.search,
+                        message: "Vui lòng đăng nhập để tiếp tục",
+                    },
+                });
+                return false;
             }
 
-            navigate(redirectPath);
+            dispatch(addToast({ type: "error", message: "Không thể thêm sản phẩm vào giỏ" }));
+            return false;
         }
     };
 
     const handleBuyNow = async () => {
-        await addToCartAndNavigate("/checkout");
+        const success = await addToCart();
+        if (success !== false) {
+            navigate("/checkout");
+        }
     };
 
     const handleAddToCart = async () => {
-        await addToCartAndNavigate("/cart");
+        await addToCart();
     };
 
     return (

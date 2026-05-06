@@ -1,8 +1,9 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../store/authSlice';
 import productsApi from '../api/productsApi';
+import { fetchCartThunk } from '../store/cartSlice';
 import '../styles/header.css';
 
 const HeaderIcon = ({ name }) => {
@@ -73,9 +74,15 @@ const Header = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user, token } = useSelector(state => state.auth);
+  const cartItems = useSelector(state => state.cart.items);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [categories, setCategories] = useState(FALLBACK_CATEGORIES);
   const dropdownRef = useRef(null);
+
+  const cartCount = useMemo(() => {
+    if (!token || !Array.isArray(cartItems)) return 0;
+    return cartItems.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+  }, [token, cartItems]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -120,6 +127,12 @@ const Header = () => {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchCartThunk());
+    }
+  }, [dispatch, token]);
 
   const categoryLinks = categories.map((category) => ({
     label: category,
@@ -216,8 +229,9 @@ const Header = () => {
               </Link>
             )}
 
-            <Link to="/cart" className="icon-btn" aria-label="Cart">
+            <Link to="/cart" className="icon-btn cart-btn" aria-label="Cart">
               <HeaderIcon name="cart" />
+              {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
             </Link>
 
             {token && user ? (

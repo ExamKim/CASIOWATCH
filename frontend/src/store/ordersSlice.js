@@ -31,9 +31,9 @@ export const fetchOrderByIdThunk = createAsyncThunk(
 // Create order from cart
 export const createOrderThunk = createAsyncThunk(
     "orders/createOrder",
-    async (_, { rejectWithValue }) => {
+    async (payload = {}, { rejectWithValue }) => {
         try {
-            const res = await ordersApi.createOrder();
+            const res = await ordersApi.createOrder(payload);
             return res.data;
         } catch (err) {
             return rejectWithValue({ message: normalizeApiError(err, "Create order failed") });

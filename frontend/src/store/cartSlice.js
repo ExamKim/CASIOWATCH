@@ -63,6 +63,9 @@ const cartSlice = createSlice({
         clearCart(state) {
             state.items = [];
         },
+        setCartItems(state, action) {
+            state.items = Array.isArray(action.payload) ? action.payload : [];
+        },
     },
     extraReducers: (builder) => {
         // fetchCartThunk
@@ -127,5 +130,5 @@ const cartSlice = createSlice({
     },
 });
 
-export const { clearCart } = cartSlice.actions;
+export const { clearCart, setCartItems } = cartSlice.actions;
 export default cartSlice.reducer;

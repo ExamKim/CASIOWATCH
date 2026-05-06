@@ -1,6 +1,6 @@
 const { pool } = require("../config/db");
 
-async function createOrderFromCart(userId) {
+async function createOrderFromCart(userId, selectedProductIds = []) {
     const connection = await pool.getConnection();
 
     try {
@@ -14,13 +14,26 @@ async function createOrderFromCart(userId) {
             [userId]
         );
 
-        if (cartItems.length === 0) {
+        const selectedIds = Array.isArray(selectedProductIds)
+            ? selectedProductIds
+                .map((value) => Number(value))
+                .filter((value) => Number.isInteger(value) && value > 0)
+            : [];
+
+        const hasSelected = selectedIds.length > 0;
+        const selectedIdSet = new Set(selectedIds);
+
+        const finalCartItems = hasSelected
+            ? cartItems.filter((item) => selectedIdSet.has(Number(item.product_id)))
+            : cartItems;
+
+        if (finalCartItems.length === 0) {
             const err = new Error("Cart is empty");
             err.status = 400;
             throw err;
         }
 
-        const totalPrice = cartItems.reduce(
+        const totalPrice = finalCartItems.reduce(
             (sum, item) => sum + Number(item.price) * Number(item.quantity),
             0
         );
@@ -31,7 +44,7 @@ async function createOrderFromCart(userId) {
         );
 
         const orderId = orderResult.insertId;
-        const orderItemValues = cartItems.map((item) => [
+        const orderItemValues = finalCartItems.map((item) => [
             orderId,
             item.product_id,
             item.name,
@@ -44,7 +57,15 @@ async function createOrderFromCart(userId) {
             [orderItemValues]
         );
 
-        await connection.query("DELETE FROM cart_items WHERE user_id = ?", [userId]);
+        if (hasSelected) {
+            const placeholders = selectedIds.map(() => "?").join(",");
+            await connection.query(
+                `DELETE FROM cart_items WHERE user_id = ? AND product_id IN (${placeholders})`,
+                [userId, ...selectedIds]
+            );
+        } else {
+            await connection.query("DELETE FROM cart_items WHERE user_id = ?", [userId]);
+        }
 
         await connection.commit();
         return { id: orderId, status: "pending", total_price: totalPrice };

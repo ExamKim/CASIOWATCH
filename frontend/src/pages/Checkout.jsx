@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrderThunk } from "../store/ordersSlice";
 import { fetchCartThunk } from "../store/cartSlice";
@@ -20,6 +20,7 @@ function formatPrice(value) {
 const Checkout = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
     const { items: cartItems } = useSelector((state) => state.cart);
     const [status, setStatus] = useState("idle");
     const [message, setMessage] = useState("");
@@ -35,7 +36,22 @@ const Checkout = () => {
         dispatch(fetchCartThunk());
     }, [dispatch]);
 
-    const items = useMemo(() => (Array.isArray(cartItems) ? cartItems : []), [cartItems]);
+    const selectedProductIds = useMemo(() => {
+        const ids = Array.isArray(location.state?.selectedProductIds)
+            ? location.state.selectedProductIds
+            : [];
+        return ids
+            .map((value) => Number(value))
+            .filter((value) => Number.isInteger(value) && value > 0);
+    }, [location.state]);
+
+    const items = useMemo(() => {
+        const allItems = Array.isArray(cartItems) ? cartItems : [];
+        if (selectedProductIds.length === 0) return allItems;
+
+        const selectedSet = new Set(selectedProductIds);
+        return allItems.filter((item) => selectedSet.has(Number(item.product_id)));
+    }, [cartItems, selectedProductIds]);
 
     const summary = useMemo(() => {
         const subtotal = items.reduce((total, item) => {
@@ -68,7 +84,7 @@ const Checkout = () => {
                 return;
             }
 
-            const order = await dispatch(createOrderThunk()).unwrap();
+            const order = await dispatch(createOrderThunk({ selectedProductIds })).unwrap();
             await dispatch(fetchCartThunk());
 
             dispatch(addToast({ type: "success", message: "Tạo đơn hàng thành công" }));

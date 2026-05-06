@@ -3,7 +3,10 @@ const orderService = require("../services/orderService");
 exports.createOrder = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const created = await orderService.createOrderFromCart(userId);
+        const selectedProductIds = Array.isArray(req.body?.selectedProductIds)
+            ? req.body.selectedProductIds
+            : [];
+        const created = await orderService.createOrderFromCart(userId, selectedProductIds);
         res.status(201).json(created);
     } catch (err) {
         next(err);
