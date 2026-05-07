@@ -4,14 +4,6 @@ const QR_BANK_CODE = process.env.QR_BANK_CODE || "MB";
 const QR_ACCOUNT_NO = process.env.QR_ACCOUNT_NO || "0979605453";
 const QR_ACCOUNT_NAME = process.env.QR_ACCOUNT_NAME || "CHIU KIM THI";
 
-function ensureAllowedStatus(status, allowed) {
-  if (!allowed.includes(status)) {
-    const err = new Error(`Invalid status. Allowed: ${allowed.join(", ")}`);
-    err.status = 400;
-    throw err;
-  }
-}
-
 async function assertOrderOwned(order, userId) {
   if (!order) {
     const err = new Error("Order not found");
@@ -106,83 +98,13 @@ async function createQRPayment({ orderId, userId }) {
   };
 }
 
-async function confirmOnlinePayment({ orderId, userId, method }) {
-  const allowedMethods = ["qr", "momo", "card"];
-  const normalizedMethod = String(method || "").trim().toLowerCase();
-  ensureAllowedStatus(normalizedMethod, allowedMethods);
-
-  const order = await getOrderById(orderId);
-  await assertOrderOwned(order, userId);
-
-  if (order.payment_status === "paid") {
-    return order;
-  }
-
-  assertOrderPayable(order);
-
-  const paymentMethod = normalizedMethod === "momo" ? "MOMO" : normalizedMethod.toUpperCase();
-
-  await pool.query(
-    `UPDATE orders
-     SET payment_method = ?,
-         payment_status = 'paid',
-         paid_at = NOW(),
-         status = 'processing'
-     WHERE id = ?`,
-    [paymentMethod, orderId]
-  );
-
-  return getOrderById(orderId);
-}
-
-// Card stub simulate
-async function simulateCardPayment({ orderId, userId, result }) {
-  ensureAllowedStatus(result, ["success", "fail"]);
-
-  const order = await getOrderById(orderId);
-  await assertOrderOwned(order, userId);
-
-  if (order.payment_status === "paid") {
-    const err = new Error("Order already paid");
-    err.status = 400;
-    throw err;
-  }
-
-  if (result === "success") {
-    await pool.query(
-      `UPDATE orders
-       SET payment_method = 'CARD',
-           payment_status = 'paid',
-           paid_at = NOW(),
-           status = 'processing'
-       WHERE id = ?`,
-      [orderId]
-    );
-  } else {
-    await pool.query(
-      `UPDATE orders
-       SET payment_method = 'CARD',
-           payment_status = 'failed',
-           status = 'pending_payment'
-       WHERE id = ?`,
-      [orderId]
-    );
-  }
-
-  return getOrderById(orderId);
-}
-
 // Debug: Log all exported functions to help trace issues
 console.log('Exporting paymentService:', {
   setCODPayment,
   createQRPayment,
-  confirmOnlinePayment,
-  simulateCardPayment,
 });
 
 module.exports = {
   setCODPayment,
   createQRPayment,
-  confirmOnlinePayment,
-  simulateCardPayment,
 };

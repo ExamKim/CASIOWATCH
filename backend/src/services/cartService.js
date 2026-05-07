@@ -13,7 +13,12 @@ async function addToCart(userId, productId, quantity) {
 async function getCartByUserId(userId) {
     // Join với bảng products để lấy tên, giá và ảnh
     const [rows] = await pool.query(
-        `SELECT c.*, p.name, p.price, p.image_url 
+        `SELECT c.*, p.name, p.price, p.sale_price,
+                CASE
+                    WHEN p.sale_price IS NOT NULL AND p.sale_price > 0 AND p.sale_price < p.price THEN p.sale_price
+                    ELSE p.price
+                END AS effective_price,
+                p.image_url 
          FROM cart_items c 
          JOIN products p ON c.product_id = p.id 
          WHERE c.user_id = ?`, [userId]

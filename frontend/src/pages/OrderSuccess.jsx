@@ -23,8 +23,6 @@ function formatDateTime(value) {
 function displayPaymentMethod(value) {
     const method = String(value || "").toLowerCase();
     if (method === "qr") return "QR Code";
-    if (method === "momo") return "MoMo";
-    if (method === "card") return "Thẻ";
     if (method === "cod") return "COD";
     return value || "N/A";
 }

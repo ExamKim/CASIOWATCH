@@ -1,11 +1,11 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrderThunk } from "../store/ordersSlice";
 import { fetchCartThunk } from "../store/cartSlice";
 import { addToast } from "../store/uiSlice";
 import { getProductImage } from "../utils/productImage";
-import paymentApi from "../api/paymentApi";
+import { getEffectivePrice } from "../utils/pricing";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/catalog.css";
 
@@ -90,7 +90,7 @@ const Checkout = () => {
 
     const summary = useMemo(() => {
         const subtotal = items.reduce((total, item) => {
-            const price = Number(item.price || 0);
+            const price = getEffectivePrice(item);
             const quantity = Number(item.quantity || 0);
             return total + price * quantity;
         }, 0);
@@ -111,16 +111,6 @@ const Checkout = () => {
             value: "qr",
             title: "QR Code",
             description: "Quét mã để thanh toán nhanh",
-        },
-        {
-            value: "card",
-            title: "Thẻ",
-            description: "Thanh toán bằng thẻ ATM / Visa / Mastercard",
-        },
-        {
-            value: "momo",
-            title: "MoMo / Ví điện tử",
-            description: "Thanh toán qua MoMo hoặc ví điện tử",
         },
         {
             value: "cod",
@@ -155,16 +145,11 @@ const Checkout = () => {
             dispatch(addToast({ type: "success", message: "Tạo đơn hàng thành công" }));
 
             if (formData.paymentMethod === "cod") {
-                try {
-                    await paymentApi.payCOD(order?.id);
-                    navigate(`/order-success?orderId=${order?.id}`);
-                } catch (codError) {
-                    const codErrorMsg = typeof codError === "string"
-                        ? codError
-                        : (codError?.message || codError?.error || "Lỗi khi xác nhận COD");
-                    setMessage(codErrorMsg);
-                    dispatch(addToast({ type: "error", message: codErrorMsg }));
-                }
+                navigate(`/payment?orderId=${order?.id}`, {
+                    state: {
+                        paymentMethod: "cod",
+                    },
+                });
                 return;
             }
 
@@ -262,7 +247,7 @@ const Checkout = () => {
                         ) : (
                             items.map((item) => {
                                 const quantity = Number(item.quantity || 1);
-                                const price = Number(item.price || 0);
+                                const price = getEffectivePrice(item);
                                 const total = quantity * price;
 
                                 return (
