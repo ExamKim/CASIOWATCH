@@ -2,6 +2,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderByIdThunk } from "../store/ordersSlice";
+import { getPaymentStatusVi, getPaymentMethodVi } from "../utils/locale";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/orders.css";
 
@@ -18,13 +19,6 @@ function formatDateTime(value) {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return String(value);
     return date.toLocaleString("vi-VN");
-}
-
-function displayPaymentMethod(value) {
-    const method = String(value || "").toLowerCase();
-    if (method === "qr") return "QR Code";
-    if (method === "cod") return "COD";
-    return value || "N/A";
 }
 
 export default function OrderSuccess() {
@@ -51,8 +45,8 @@ export default function OrderSuccess() {
                 <div className="success-summary" style={{ marginBottom: 20 }}>
                     <p><strong>Mã đơn:</strong> #{orderId || currentOrder?.id || "N/A"}</p>
                     <p><strong>Ngày tạo:</strong> {formatDateTime(currentOrder?.created_at)}</p>
-                    <p><strong>Phương thức thanh toán:</strong> {displayPaymentMethod(currentOrder?.payment_method)}</p>
-                    <p><strong>Trạng thái thanh toán:</strong> {currentOrder?.payment_status || "pending"}</p>
+                    <p><strong>Phương thức thanh toán:</strong> {getPaymentMethodVi(currentOrder?.payment_method)}</p>
+                    <p><strong>Trạng thái thanh toán:</strong> {getPaymentStatusVi(currentOrder?.payment_status)}</p>
                     <p><strong>Tổng thanh toán:</strong> {formatPrice(currentOrder?.total_price)}</p>
                 </div>
 

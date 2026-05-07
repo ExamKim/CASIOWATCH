@@ -88,6 +88,29 @@ const ProductDetail = () => {
     const productCode = String(resolvedProduct?.name || "").split(" ").slice(-2).join(" ") || resolvedProduct?.name || "MODEL";
     const shortName = resolvedProduct?.name?.replace(/^Casio\s+/i, "") || resolvedProduct?.name || "Watch";
 
+    const handleBuyNow = async () => {
+        if (!token) {
+            dispatch(addToast({ type: "info", message: "Vui lòng đăng nhập để mua hàng" }));
+            navigate("/login", {
+                state: {
+                    from: location.pathname + location.search,
+                    message: "Vui lòng đăng nhập để tiếp tục",
+                },
+            });
+            return;
+        }
+
+        const productId = Number(resolvedProduct?.id);
+        navigate(`/checkout${Number.isInteger(productId) && productId > 0 ? `?buyNowProductId=${productId}` : ""}`, {
+            state: {
+                buyNowProduct: {
+                    ...resolvedProduct,
+                    quantity: 1,
+                },
+            },
+        });
+    };
+
     const handleAddToCart = async () => {
         if (!token) {
             dispatch(addToast({ type: "info", message: "Vui lòng đăng nhập để thêm vào giỏ hàng" }));
@@ -162,14 +185,15 @@ const ProductDetail = () => {
                     </p>
 
                     <div className="detail-actions">
-                        <button type="button" className="detail-buy-btn" onClick={handleAddToCart} disabled={isAdding}>
-                            {isAdding ? "Đang thêm..." : "Thêm vào giỏ hàng"}
+                        <button type="button" className="detail-buy-btn" onClick={handleBuyNow}>
+                            Mua ngay
                         </button>
-                        <button type="button" className="detail-icon-btn" aria-label="Yêu thích">
-                            ♡
-                        </button>
-                        <button type="button" className="detail-icon-btn" aria-label="Chia sẻ">
-                            ↗
+                        <button type="button" className="detail-icon-btn" aria-label="Thêm vào giỏ hàng" onClick={handleAddToCart} disabled={isAdding}>
+                            <svg viewBox="0 0 24 24" className="header-icon-svg" aria-hidden="true">
+                                <path d="M4 5h2l2 10h10l2-7H7.2" />
+                                <circle cx="10" cy="19" r="1.5" />
+                                <circle cx="17" cy="19" r="1.5" />
+                            </svg>
                         </button>
                     </div>
 

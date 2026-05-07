@@ -122,6 +122,10 @@ const Edifice = () => {
                     </div>
                     <div className="catalog-hero-panel">
                         <img src={heroImage} alt="Edifice" onError={(e) => e.currentTarget.src = '/img/login1.jpg'} />
+                        <div className="catalog-hero-panel-copy">
+                            <span>Limited edition</span>
+                            <strong>Edifice Collection</strong>
+                        </div>
                     </div>
                 </div>
             </section>

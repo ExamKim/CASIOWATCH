@@ -70,6 +70,16 @@
     text-transform: uppercase;
 }
 
+.offers-hero-info {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #d4af37;
+    font-size: 14px;
+    font-weight: 600;
+}
+
 .offers-section {
     max-width: 1220px;
     margin: 0 auto;
@@ -115,6 +125,52 @@
     border-radius: 999px;
     background: #d4af37;
     margin-bottom: 20px;
+}
+
+/* Products Grid */
+.offers-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+.offers-status,
+.offers-error,
+.offers-empty p {
+    text-align: center;
+    padding: 24px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid #e6decd;
+    color: #615b50;
+}
+
+.offers-error {
+    color: #b83b2f;
+    border-color: #efcdc8;
+    background: #fff6f4;
+}
+
+.offers-empty {
+    border-radius: 20px;
+    border: 1px solid #e8dfcf;
+    background: rgba(255, 255, 255, 0.84);
+    padding: 40px 26px;
+    text-align: center;
+}
+
+.offers-empty p {
+    margin: 0 0 14px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #6a6459;
+}
+
+@media (max-width: 768px) {
+    .offers-products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
 }
 
 .offers-curated-grid {

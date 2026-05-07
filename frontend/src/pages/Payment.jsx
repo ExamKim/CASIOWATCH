@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import QRPaymentInfo from "../components/QRPaymentInfo";
 import { fetchOrderByIdThunk } from "../store/ordersSlice";
 import { clearPaymentState, createQR, payCOD } from "../store/paymentSlice";
+import { getPaymentMethodVi } from "../utils/locale";
 import { addToast } from "../store/uiSlice";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/orders.css";
@@ -103,11 +104,7 @@ export default function Payment() {
 
             <section className="orders-content payment-layout">
                 <div className="payment-card">
-                    <h2>Phương thức thanh toán</h2>
-                    <div className="payment-method-tabs">
-                        <button type="button" className={method === "qr" ? "active" : ""} onClick={() => setMethod("qr")}>QR Code</button>
-                        <button type="button" className={method === "cod" ? "active" : ""} onClick={() => setMethod("cod")}>COD</button>
-                    </div>
+                    <h2>Phương thức thanh toán: <strong>{getPaymentMethodVi(method)}</strong></h2>
 
                     {method === "qr" && (
                         <div className="payment-method-panel">

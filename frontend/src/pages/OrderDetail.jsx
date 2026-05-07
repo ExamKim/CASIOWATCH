@@ -2,6 +2,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderByIdThunk } from "../store/ordersSlice";
+import { getOrderStatusVi, getPaymentStatusVi, getPaymentMethodVi } from "../utils/locale";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/orders.css";
 
@@ -48,11 +49,15 @@ export default function OrderDetail() {
                         <div className="order-detail-top">
                             <div>
                                 <p className="order-card-label">Trạng thái đơn</p>
-                                <span className={statusClass(currentOrder.status)}>{currentOrder.status}</span>
+                                <span className={statusClass(currentOrder.status)}>{getOrderStatusVi(currentOrder.status)}</span>
+                            </div>
+                            <div>
+                                <p className="order-card-label">Phương thức</p>
+                                <span>{getPaymentMethodVi(currentOrder.payment_method)}</span>
                             </div>
                             <div>
                                 <p className="order-card-label">Thanh toán</p>
-                                <span className={statusClass(currentOrder.payment_status || "pending")}>{currentOrder.payment_status || "pending"}</span>
+                                <span className={statusClass(currentOrder.payment_status || "pending")}>{getPaymentStatusVi(currentOrder.payment_status)}</span>
                             </div>
                             <div>
                                 <p className="order-card-label">Tổng tiền</p>

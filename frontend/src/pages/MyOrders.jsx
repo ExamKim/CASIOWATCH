@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { cancelOrderThunk, fetchMyOrdersThunk } from "../store/ordersSlice";
 import { addToast } from "../store/uiSlice";
+import { getOrderStatusVi, getPaymentStatusVi, getPaymentMethodVi } from "../utils/locale";
 import SiteFooter from "../components/SiteFooter";
 import "../styles/orders.css";
 
@@ -82,11 +83,15 @@ export default function MyOrders() {
                                 </div>
                                 <div>
                                     <p className="order-card-label">Trạng thái</p>
-                                    <span className={statusClass(order.status)}>{order.status}</span>
+                                    <span className={statusClass(order.status)}>{getOrderStatusVi(order.status)}</span>
+                                </div>
+                                <div>
+                                    <p className="order-card-label">Phương thức</p>
+                                    <span>{getPaymentMethodVi(order.payment_method)}</span>
                                 </div>
                                 <div>
                                     <p className="order-card-label">Thanh toán</p>
-                                    <span className={statusClass(order.payment_status || "pending")}>{order.payment_status || "pending"}</span>
+                                    <span className={statusClass(order.payment_status || "pending")}>{getPaymentStatusVi(order.payment_status)}</span>
                                 </div>
                                 <div className="order-card-actions">
                                     <Link to={`/orders/${order.id}`} className="orders-outline-btn">Chi tiết</Link>

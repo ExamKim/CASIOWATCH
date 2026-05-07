@@ -104,7 +104,7 @@ const BabyG = () => {
                     <div className="catalog-hero-copy">
                         <p className="catalog-subheading">Bộ sưu tập Baby-G</p>
                         <h1>BABY-G Collection</h1>
-                        <p>Nhung mau đồng hồ tre trung va nang dong cho phai nu.</p>
+                        <p>Những mẫu đồng hồ trẻ trung và năng động cho phái nữ.</p>
 
                         <div className="catalog-hero-stats">
                             <div>
@@ -116,7 +116,7 @@ const BabyG = () => {
                                 <span>Giao hàng nhanh</span>
                             </div>
                             <div>
-                                <strong>1 nam</strong>
+                                <strong>1 năm</strong>
                                 <span>Bảo hành chính hãng</span>
                             </div>
                         </div>
@@ -128,6 +128,10 @@ const BabyG = () => {
                             alt="Baby-G showcase"
                             onError={(e) => (e.currentTarget.src = "/img/login1.jpg")}
                         />
+                        <div className="catalog-hero-panel-copy">
+                            <span>Limited edition</span>
+                            <strong>Baby-G Collection</strong>
+                        </div>
                     </div>
                 </div>
             </section>
