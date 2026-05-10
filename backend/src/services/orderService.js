@@ -1,7 +1,8 @@
-﻿const { pool } = require("../config/db");
+const { pool } = require("../config/db");
 const productService = require("./productService");
 
-async function createOrderFromCart(userId, selectedProductIds = [], buyNowProductId = null) {
+async function createOrderFromCart(userId, selectedProductIds = [], buyNowProductId = null, shippingInfo = {}) {
+    const { address = null, phone = null, note = null, buyNowQuantity = 1 } = shippingInfo;
     const connection = await pool.getConnection();
 
     try {
@@ -54,25 +55,25 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
                 : Number(product.price);
 
             const [orderResult] = await connection.query(
-                "INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, 'pending')",
-                [userId, directPrice]
+                "INSERT INTO orders (user_id, total_price, status, address, phone, note) VALUES (?, ?, 'pending', ?, ?, ?)",
+                [userId, directPrice * buyNowQuantity, address, phone, note]
             );
 
             const orderId = orderResult.insertId;
 
             await connection.query(
                 "INSERT INTO order_items (order_id, product_id, name, price, quantity) VALUES (?, ?, ?, ?, ?)",
-                [orderId, product.id, product.name, directPrice, 1]
+                [orderId, product.id, product.name, directPrice, buyNowQuantity]
             );
 
             // Deduct stock
             await connection.query(
-                "UPDATE products SET stock = stock - 1 WHERE id = ?",
-                [directProductId]
+                "UPDATE products SET stock = stock - ? WHERE id = ?",
+                [buyNowQuantity, directProductId]
             );
 
             await connection.commit();
-            return { id: orderId, status: "pending", total_price: directPrice };
+            return { id: orderId, status: "pending", total_price: directPrice * buyNowQuantity };
         }
 
         const finalCartItems = hasSelected
@@ -133,8 +134,8 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
         }, 0);
 
         const [orderResult] = await connection.query(
-            "INSERT INTO orders (user_id, total_price, status) VALUES (?, ?, 'pending')",
-            [userId, totalPrice]
+            "INSERT INTO orders (user_id, total_price, status, address, phone, note) VALUES (?, ?, 'pending', ?, ?, ?)",
+            [userId, totalPrice, address, phone, note]
         );
 
         const orderId = orderResult.insertId;
@@ -205,47 +206,72 @@ async function getOrderDetail(orderId) {
 }
 
 async function cancelOrder({ orderId, userId }) {
-    const [[order]] = await pool.query("SELECT * FROM orders WHERE id = ?", [orderId]);
+    const connection = await pool.getConnection();
 
-    if (!order) {
-        const err = new Error("Order not found");
-        err.status = 404;
+    try {
+        await connection.beginTransaction();
+
+        const [[order]] = await connection.query("SELECT * FROM orders WHERE id = ? FOR UPDATE", [orderId]);
+
+        if (!order) {
+            const err = new Error("Order not found");
+            err.status = 404;
+            throw err;
+        }
+
+        if (Number(order.user_id) !== Number(userId)) {
+            const err = new Error("Forbidden");
+            err.status = 403;
+            throw err;
+        }
+
+        const currentStatus = String(order.status || "").toLowerCase();
+        const paymentStatus = String(order.payment_status || "").toLowerCase();
+
+        if (["cancelled", "completed", "delivered"].includes(currentStatus)) {
+            const err = new Error("Order cannot be cancelled");
+            err.status = 400;
+            throw err;
+        }
+
+        if (paymentStatus === "paid") {
+            const err = new Error("Cannot cancel order that has been paid. Please contact support for refund requests.");
+            err.status = 400;
+            throw err;
+        }
+
+        // Restore stock for all items in the order
+        const [items] = await connection.query(
+            "SELECT product_id, quantity FROM order_items WHERE order_id = ?",
+            [orderId]
+        );
+
+        for (const item of items) {
+            await connection.query(
+                "UPDATE products SET stock = stock + ? WHERE id = ?",
+                [Number(item.quantity), Number(item.product_id)]
+            );
+        }
+
+        await connection.query(
+            `UPDATE orders
+             SET status = 'cancelled',
+                 payment_status = CASE
+                   WHEN payment_status IS NULL OR payment_status IN ('unpaid', 'pending', 'failed') THEN 'cancelled'
+                   ELSE payment_status
+                 END
+             WHERE id = ?`,
+            [orderId]
+        );
+
+        await connection.commit();
+        return getOrderDetail(orderId);
+    } catch (err) {
+        await connection.rollback();
         throw err;
+    } finally {
+        connection.release();
     }
-
-    if (Number(order.user_id) !== Number(userId)) {
-        const err = new Error("Forbidden");
-        err.status = 403;
-        throw err;
-    }
-
-    const currentStatus = String(order.status || "").toLowerCase();
-    const paymentStatus = String(order.payment_status || "").toLowerCase();
-
-    if (["cancelled", "completed", "delivered"].includes(currentStatus)) {
-        const err = new Error("Order cannot be cancelled");
-        err.status = 400;
-        throw err;
-    }
-
-    if (paymentStatus === "paid") {
-        const err = new Error("Cannot cancel order that has been paid. Please contact support for refund requests.");
-        err.status = 400;
-        throw err;
-    }
-
-    await pool.query(
-        `UPDATE orders
-         SET status = 'cancelled',
-             payment_status = CASE
-               WHEN payment_status IS NULL OR payment_status IN ('unpaid', 'pending', 'failed') THEN 'cancelled'
-               ELSE payment_status
-             END
-         WHERE id = ?`,
-        [orderId]
-    );
-
-    return getOrderDetail(orderId);
 }
 
 module.exports = {

@@ -7,7 +7,14 @@ exports.createOrder = async (req, res, next) => {
             ? req.body.selectedProductIds
             : [];
         const buyNowProductId = Number(req.body?.buyNowProductId);
-        const created = await orderService.createOrderFromCart(userId, selectedProductIds, buyNowProductId);
+        const buyNowQuantity = Math.max(1, Number(req.body?.buyNowQuantity) || 1);
+        const shippingInfo = {
+            address: req.body?.address,
+            phone: req.body?.phone,
+            note: req.body?.note,
+            buyNowQuantity,
+        };
+        const created = await orderService.createOrderFromCart(userId, selectedProductIds, buyNowProductId, shippingInfo);
         res.status(201).json(created);
     } catch (err) {
         next(err);

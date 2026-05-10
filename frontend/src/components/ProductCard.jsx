@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import cartApi from "../api/cartApi";
@@ -103,7 +103,6 @@ const ProductCard = ({ product }) => {
                     {product?.name}
                 </Link>
 
-                <div className="catalog-card-price-wrap">
                     {isOnSale ? (
                         <>
                             <span className="catalog-card-price-sale">{formatPrice(product.sale_price)}</span>
@@ -114,11 +113,28 @@ const ProductCard = ({ product }) => {
                     )}
                 </div>
 
+                <div className="catalog-card-stock" style={{ fontSize: '0.82rem', color: product.stock > 0 ? '#27ae60' : '#eb5757', marginBottom: 12, fontWeight: 500 }}>
+                    {product.stock > 0 ? `Số lượng: ${product.stock}` : "Hết hàng"}
+                </div>
+
                 <div className="catalog-card-actions">
-                    <button type="button" className="catalog-buy-btn" onClick={handleBuyNow}>
-                        Mua ngay
+                    <button 
+                        type="button" 
+                        className="catalog-buy-btn" 
+                        onClick={handleBuyNow}
+                        disabled={product.stock <= 0}
+                        style={{ opacity: product.stock <= 0 ? 0.6 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
+                    >
+                        {product.stock > 0 ? "Mua ngay" : "Hết hàng"}
                     </button>
-                    <button type="button" className="catalog-icon-btn" aria-label="Thêm vào giỏ hàng" onClick={handleAddToCart}>
+                    <button 
+                        type="button" 
+                        className="catalog-icon-btn" 
+                        aria-label="Thêm vào giỏ hàng" 
+                        onClick={handleAddToCart}
+                        disabled={product.stock <= 0}
+                        style={{ opacity: product.stock <= 0 ? 0.6 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
+                    >
                         <svg viewBox="0 0 24 24" className="header-icon-svg" aria-hidden="true">
                             <path d="M4 5h2l2 10h10l2-7H7.2" />
                             <circle cx="10" cy="19" r="1.5" />

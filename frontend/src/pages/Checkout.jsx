@@ -132,6 +132,18 @@ const Checkout = () => {
                 return;
             }
 
+            if (!formData.address?.trim()) {
+                setMessage("Vui lòng nhập địa chỉ giao hàng.");
+                setStatus("idle");
+                return;
+            }
+
+            if (!formData.phone?.trim()) {
+                setMessage("Vui lòng nhập số điện thoại.");
+                setStatus("idle");
+                return;
+            }
+
             const createPayload = Number.isInteger(directBuyNowId) && directBuyNowId > 0
                 ? { buyNowProductId: directBuyNowId }
                 : (selectedProductIds.length > 0 ? { selectedProductIds } : {});

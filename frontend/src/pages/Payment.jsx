@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import QRPaymentInfo from "../components/QRPaymentInfo";
@@ -61,10 +61,19 @@ export default function Payment() {
         };
     }, [paymentState.qr]);
 
+    useEffect(() => {
+        if (!orderId || paymentState.loading) return;
+
+        if (method === "qr" && !paymentState.qr) {
+            handleCreateQR();
+        } else if (method === "cod" && currentOrder && currentOrder.status === "pending") {
+            handleCOD();
+        }
+    }, [orderId, method, paymentState.qr, paymentState.loading, currentOrder]);
+
     const handleCreateQR = async () => {
         try {
             await dispatch(createQR(Number(orderId))).unwrap();
-            dispatch(addToast({ type: "success", message: "Đã tạo thông tin thanh toán QR" }));
             dispatch(fetchOrderByIdThunk(orderId));
         } catch (err) {
             dispatch(addToast({ type: "error", message: typeof err === "string" ? err : "Không tạo được QR" }));
@@ -99,7 +108,7 @@ export default function Payment() {
             <section className="orders-hero">
                 <p className="orders-kicker">Thanh toán</p>
                 <h1>Thanh toán đơn #{orderId}</h1>
-                <p>Chọn phương thức thanh toán phù hợp và hoàn tất đơn hàng.</p>
+                <p>Thông tin thanh toán của bạn đã được chuẩn bị sẵn sàng.</p>
             </section>
 
             <section className="orders-content payment-layout">
@@ -108,42 +117,52 @@ export default function Payment() {
 
                     {method === "qr" && (
                         <div className="payment-method-panel">
-                            <p>Quét QR hoặc copy nội dung chuyển khoản bên dưới. Đơn sẽ ở trạng thái chờ thanh toán cho đến khi được đối soát.</p>
-                            <button type="button" className="orders-primary-btn" onClick={handleCreateQR} disabled={paymentState.loading}>
-                                {paymentState.loading ? "Đang tạo QR..." : "Tạo thông tin QR"}
-                            </button>
-                            <QRPaymentInfo
-                                qr={qrData?.qrContent}
-                                note={qrData?.note}
-                                qrImageUrl={qrData?.qrImageUrl}
-                                bankCode={qrData?.bankCode}
-                                accountNo={qrData?.accountNo}
-                                accountName={qrData?.accountName}
-                                amount={qrData?.amount}
-                            />
-                            {qrData?.qrImageUrl && (
-                                <div className="payment-summary-card" style={{ marginTop: 16 }}>
-                                    <p>Đơn hàng đã được ghi nhận. Sau khi chuyển khoản, hệ thống sẽ xử lý đơn theo trạng thái chờ thanh toán.</p>
-                                    <div className="order-card-actions">
-                                        <Link to={`/orders/${orderId}`} className="orders-outline-btn">Xem chi tiết đơn</Link>
-                                    </div>
-                                </div>
+                            {paymentState.loading && !qrData ? (
+                                <p>Đang khởi tạo thông tin chuyển khoản...</p>
+                            ) : (
+                                <>
+                                    <p>Quét QR hoặc copy nội dung chuyển khoản bên dưới để hoàn tất đơn hàng.</p>
+                                    <QRPaymentInfo
+                                        qr={qrData?.qrContent}
+                                        note={qrData?.note}
+                                        qrImageUrl={qrData?.qrImageUrl}
+                                        bankCode={qrData?.bankCode}
+                                        accountNo={qrData?.accountNo}
+                                        accountName={qrData?.accountName}
+                                        amount={qrData?.amount}
+                                    />
+                                    {qrData?.qrImageUrl && (
+                                        <div className="payment-summary-card" style={{ marginTop: 16 }}>
+                                            <p>Sau khi chuyển khoản, hệ thống sẽ kiểm tra và cập nhật trạng thái đơn hàng của bạn.</p>
+                                            <div className="order-card-actions">
+                                                <Link to={`/orders/${orderId}`} className="orders-primary-btn">Xem chi tiết đơn</Link>
+                                                <Link to="/my-orders" className="orders-outline-btn">Danh sách đơn hàng</Link>
+                                                <Link to="/products" className="orders-outline-btn">Tiếp tục mua sắm</Link>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     )}
 
                     {method === "cod" && (
                         <div className="payment-method-panel">
-                            <p>Chọn COD nghĩa là bạn thanh toán khi nhận hàng. Đơn sẽ được chuyển sang trạng thái đang xử lý sau khi xác nhận.</p>
-                            <button type="button" className="orders-primary-btn" onClick={handleCOD} disabled={paymentState.loading}>
-                                {paymentState.loading ? "Đang xác nhận..." : "Xác nhận COD"}
-                            </button>
-                            <div className="payment-summary-card" style={{ marginTop: 16 }}>
-                                <p><strong>Số tiền thu khi giao hàng:</strong> {formatPrice(currentOrder?.total_price)}</p>
-                                <div className="order-card-actions">
-                                    <Link to={`/orders/${orderId}`} className="orders-outline-btn">Xem chi tiết đơn</Link>
-                                </div>
-                            </div>
+                            {paymentState.loading ? (
+                                <p>Đang xác nhận hình thức COD...</p>
+                            ) : (
+                                <>
+                                    <p>Hệ thống đang ghi nhận yêu cầu thanh toán khi nhận hàng của bạn.</p>
+                                    <div className="payment-summary-card" style={{ marginTop: 16 }}>
+                                        <p><strong>Số tiền thu khi giao hàng:</strong> {formatPrice(currentOrder?.total_price)}</p>
+                                        <div className="order-card-actions">
+                                            <Link to={`/orders/${orderId}`} className="orders-primary-btn">Xem chi tiết đơn</Link>
+                                            <Link to="/my-orders" className="orders-outline-btn">Danh sách đơn hàng</Link>
+                                            <Link to="/products" className="orders-outline-btn">Tiếp tục mua sắm</Link>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     )}
                 </div>

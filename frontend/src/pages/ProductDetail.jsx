@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import productsApi from "../api/productsApi";
@@ -184,11 +184,28 @@ const ProductDetail = () => {
                         tông màu vàng sang trọng và cảm giác đeo chắc tay tạo nên một điểm nhấn rất Casio.
                     </p>
 
+                    <div className="detail-stock-info" style={{ marginBottom: 16, fontSize: '0.95rem', color: resolvedProduct.stock > 0 ? '#27ae60' : '#eb5757', fontWeight: 600 }}>
+                        {resolvedProduct.stock > 0 ? `Hiện còn: ${resolvedProduct.stock} sản phẩm` : "Sản phẩm hiện đang hết hàng"}
+                    </div>
+
                     <div className="detail-actions">
-                        <button type="button" className="detail-buy-btn" onClick={handleBuyNow}>
-                            Mua ngay
+                        <button 
+                            type="button" 
+                            className="detail-buy-btn" 
+                            onClick={handleAddToCart} 
+                            disabled={isAdding || resolvedProduct.stock <= 0}
+                            style={{ opacity: resolvedProduct.stock <= 0 ? 0.6 : 1, cursor: resolvedProduct.stock <= 0 ? 'not-allowed' : 'pointer' }}
+                        >
+                            {isAdding ? "Đang thêm..." : (resolvedProduct.stock > 0 ? "Thêm vào giỏ hàng" : "Hết hàng")}
                         </button>
-                        <button type="button" className="detail-icon-btn" aria-label="Thêm vào giỏ hàng" onClick={handleAddToCart} disabled={isAdding}>
+                        <button 
+                            type="button" 
+                            className="detail-icon-btn" 
+                            aria-label="Thêm vào giỏ hàng" 
+                            onClick={handleAddToCart} 
+                            disabled={isAdding || resolvedProduct.stock <= 0}
+                            style={{ opacity: resolvedProduct.stock <= 0 ? 0.6 : 1, cursor: resolvedProduct.stock <= 0 ? 'not-allowed' : 'pointer' }}
+                        >
                             <svg viewBox="0 0 24 24" className="header-icon-svg" aria-hidden="true">
                                 <path d="M4 5h2l2 10h10l2-7H7.2" />
                                 <circle cx="10" cy="19" r="1.5" />

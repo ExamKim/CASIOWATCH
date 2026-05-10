@@ -98,13 +98,42 @@ async function createQRPayment({ orderId, userId }) {
   };
 }
 
-// Debug: Log all exported functions to help trace issues
-console.log('Exporting paymentService:', {
-  setCODPayment,
-  createQRPayment,
-});
+// Giả lập Webhook xác nhận thanh toán thành công
+async function verifyPaymentSimulation(orderId) {
+  const order = await getOrderById(orderId);
+  if (!order) {
+    const err = new Error("Order not found");
+    err.status = 404;
+    throw err;
+  }
+
+  // Không cho phép xác nhận thanh toán cho đơn hàng đã hủy hoặc hoàn thành
+  const currentStatus = String(order.status || "").toLowerCase();
+  if (["cancelled", "completed", "delivered"].includes(currentStatus)) {
+    const err = new Error(`Không thể xác nhận thanh toán cho đơn hàng có trạng thái: ${currentStatus}`);
+    err.status = 400;
+    throw err;
+  }
+
+  // Không xác nhận lại nếu đã paid
+  if (String(order.payment_status || "").toLowerCase() === "paid") {
+    return order;
+  }
+
+  await pool.query(
+    `UPDATE orders
+     SET payment_status = 'paid',
+         status = 'processing',
+         paid_at = NOW()
+     WHERE id = ?`,
+    [orderId]
+  );
+
+  return getOrderById(orderId);
+}
 
 module.exports = {
   setCODPayment,
   createQRPayment,
+  verifyPaymentSimulation
 };

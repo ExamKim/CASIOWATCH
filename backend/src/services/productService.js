@@ -34,7 +34,7 @@ async function list({ q, brand, category, gender, minPrice, maxPrice, sort, page
     const _limit = Math.max(1, Math.min(100, Number(limit) || 12));
     const offset = (_page - 1) * _limit;
 
-    const where = [];
+    const where = ["status <> 'deleted'"];
     const params = [];
 
     if (q && String(q).trim() !== "") {
@@ -107,6 +107,7 @@ async function create(payload) {
         price,
         sale_price = null,
         salePrice = null,
+        image_url = null,
         stock = 0,
         status = "active",
     } = payload;
@@ -114,15 +115,15 @@ async function create(payload) {
     const finalSalePrice = sale_price != null ? sale_price : salePrice;
 
     const [result] = await pool.query(
-        `INSERT INTO products (name, category, gender, brand, price, sale_price, stock, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, category, gender, brand, price, finalSalePrice, stock, status]
+        `INSERT INTO products (name, category, gender, brand, price, sale_price, image_url, stock, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [name, category, gender, brand, price, finalSalePrice, image_url, stock, status]
     );
     return await findById(result.insertId);
 }
 
 async function update(id, payload) {
-    const allowed = ["name", "category", "gender", "brand", "price", "sale_price", "stock", "status"];
+    const allowed = ["name", "category", "gender", "brand", "price", "sale_price", "image_url", "stock", "status"];
     const normalized = { ...payload };
     if (normalized.sale_price == null && normalized.salePrice != null) {
         normalized.sale_price = normalized.salePrice;
@@ -146,13 +147,13 @@ async function update(id, payload) {
 }
 
 async function remove(id) {
-    const [result] = await pool.query("DELETE FROM products WHERE id = ?", [id]);
+    const [result] = await pool.query("UPDATE products SET status = 'deleted' WHERE id = ?", [id]);
     return result.affectedRows > 0;
 }
 
 async function listSale() {
     const [rows] = await pool.query(
-        "SELECT * FROM products WHERE sale_price IS NOT NULL AND sale_price < price ORDER BY id DESC"
+        "SELECT * FROM products WHERE status <> 'deleted' AND sale_price IS NOT NULL AND sale_price < price ORDER BY id DESC"
     );
     return rows;
 }
