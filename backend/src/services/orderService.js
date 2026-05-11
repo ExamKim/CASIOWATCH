@@ -44,8 +44,13 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
             }
 
             const stock = Number(product.stock || 0);
-            if (stock < 1) {
-                const err = new Error(`Sản phẩm "${product.name}" hết hàng`);
+            if (stock < buyNowQuantity) {
+                if (stock <= 0) {
+                    const err = new Error(`Sản phẩm "${product.name}" đã hết hàng`);
+                    err.status = 400;
+                    throw err;
+                }
+                const err = new Error(`Kho chỉ còn ${stock} sản phẩm. Không thể mua ${buyNowQuantity} chiếc.`);
                 err.status = 400;
                 throw err;
             }
@@ -54,9 +59,32 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
                 ? Number(product.sale_price)
                 : Number(product.price);
 
+            // detect existing columns on orders table to avoid unknown column errors
+            const [orderTableCols] = await connection.query("SHOW COLUMNS FROM orders");
+            const availableCols = new Set(orderTableCols.map(c => c.Field));
+
+            const orderCols = ["user_id", "total_price", "status"];
+            const orderPlaceholders = ["?", "?", "?"];
+            const orderParams = [userId, directPrice * buyNowQuantity, "pending"];
+            if (address != null && availableCols.has("address")) {
+                orderCols.push("address");
+                orderPlaceholders.push("?");
+                orderParams.push(address);
+            }
+            if (phone != null && availableCols.has("phone")) {
+                orderCols.push("phone");
+                orderPlaceholders.push("?");
+                orderParams.push(phone);
+            }
+            if (note != null && availableCols.has("note")) {
+                orderCols.push("note");
+                orderPlaceholders.push("?");
+                orderParams.push(note);
+            }
+
             const [orderResult] = await connection.query(
-                "INSERT INTO orders (user_id, total_price, status, address, phone, note) VALUES (?, ?, 'pending', ?, ?, ?)",
-                [userId, directPrice * buyNowQuantity, address, phone, note]
+                `INSERT INTO orders (${orderCols.join(", ")}) VALUES (${orderPlaceholders.join(", ")})`,
+                orderParams
             );
 
             const orderId = orderResult.insertId;
@@ -133,9 +161,32 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
             return sum + itemPrice * quantity;
         }, 0);
 
+        // detect existing columns on orders table to avoid unknown column errors
+        const [orderTableCols] = await connection.query("SHOW COLUMNS FROM orders");
+        const availableCols = new Set(orderTableCols.map(c => c.Field));
+
+        const orderCols = ["user_id", "total_price", "status"];
+        const orderPlaceholders = ["?", "?", "?"];
+        const orderParams = [userId, totalPrice, "pending"];
+        if (address != null && availableCols.has("address")) {
+            orderCols.push("address");
+            orderPlaceholders.push("?");
+            orderParams.push(address);
+        }
+        if (phone != null && availableCols.has("phone")) {
+            orderCols.push("phone");
+            orderPlaceholders.push("?");
+            orderParams.push(phone);
+        }
+        if (note != null && availableCols.has("note")) {
+            orderCols.push("note");
+            orderPlaceholders.push("?");
+            orderParams.push(note);
+        }
+
         const [orderResult] = await connection.query(
-            "INSERT INTO orders (user_id, total_price, status, address, phone, note) VALUES (?, ?, 'pending', ?, ?, ?)",
-            [userId, totalPrice, address, phone, note]
+            `INSERT INTO orders (${orderCols.join(", ")}) VALUES (${orderPlaceholders.join(", ")})`,
+            orderParams
         );
 
         const orderId = orderResult.insertId;

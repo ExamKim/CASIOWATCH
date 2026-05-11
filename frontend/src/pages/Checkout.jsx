@@ -144,9 +144,25 @@ const Checkout = () => {
                 return;
             }
 
-            const createPayload = Number.isInteger(directBuyNowId) && directBuyNowId > 0
-                ? { buyNowProductId: directBuyNowId }
-                : (selectedProductIds.length > 0 ? { selectedProductIds } : {});
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (formData.email && !emailRegex.test(formData.email)) {
+                setMessage("Định dạng email không hợp lệ.");
+                setStatus("idle");
+                return;
+            }
+
+            const createPayload = {
+                address: formData.address,
+                phone: formData.phone,
+                note: formData.note,
+            };
+
+            if (Number.isInteger(directBuyNowId) && directBuyNowId > 0) {
+                createPayload.buyNowProductId = directBuyNowId;
+                createPayload.buyNowQuantity = buyNowProduct?.quantity || 1;
+            } else if (selectedProductIds.length > 0) {
+                createPayload.selectedProductIds = selectedProductIds;
+            }
 
             const order = await dispatch(createOrderThunk(createPayload)).unwrap();
 

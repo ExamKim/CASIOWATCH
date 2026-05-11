@@ -103,34 +103,33 @@ const ProductCard = ({ product }) => {
                     {product?.name}
                 </Link>
 
-                    {isOnSale ? (
-                        <>
-                            <span className="catalog-card-price-sale">{formatPrice(product.sale_price)}</span>
-                            <span className="catalog-card-price-original">{formatPrice(product.price)}</span>
-                        </>
-                    ) : (
-                        <span className="catalog-card-price">{formatPrice(product?.price)}</span>
-                    )}
-                </div>
+                {isOnSale ? (
+                    <>
+                        <span className="catalog-card-price-sale">{formatPrice(product.sale_price)}</span>
+                        <span className="catalog-card-price-original">{formatPrice(product.price)}</span>
+                    </>
+                ) : (
+                    <span className="catalog-card-price">{formatPrice(product?.price)}</span>
+                )}
 
                 <div className="catalog-card-stock" style={{ fontSize: '0.82rem', color: product.stock > 0 ? '#27ae60' : '#eb5757', marginBottom: 12, fontWeight: 500 }}>
                     {product.stock > 0 ? `Số lượng: ${product.stock}` : "Hết hàng"}
                 </div>
 
                 <div className="catalog-card-actions">
-                    <button 
-                        type="button" 
-                        className="catalog-buy-btn" 
+                    <button
+                        type="button"
+                        className="catalog-buy-btn"
                         onClick={handleBuyNow}
                         disabled={product.stock <= 0}
                         style={{ opacity: product.stock <= 0 ? 0.6 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
                     >
                         {product.stock > 0 ? "Mua ngay" : "Hết hàng"}
                     </button>
-                    <button 
-                        type="button" 
-                        className="catalog-icon-btn" 
-                        aria-label="Thêm vào giỏ hàng" 
+                    <button
+                        type="button"
+                        className="catalog-icon-btn"
+                        aria-label="Thêm vào giỏ hàng"
                         onClick={handleAddToCart}
                         disabled={product.stock <= 0}
                         style={{ opacity: product.stock <= 0 ? 0.6 : 1, cursor: product.stock <= 0 ? 'not-allowed' : 'pointer' }}
