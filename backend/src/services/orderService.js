@@ -2,7 +2,7 @@ const { pool } = require("../config/db");
 const productService = require("./productService");
 
 async function createOrderFromCart(userId, selectedProductIds = [], buyNowProductId = null, shippingInfo = {}) {
-    const { address = null, phone = null, note = null, buyNowQuantity = 1 } = shippingInfo;
+    const { address = null, phone = null, note = null, recipient = null, buyNowQuantity = 1 } = shippingInfo;
     const connection = await pool.getConnection();
 
     try {
@@ -59,27 +59,31 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
                 ? Number(product.sale_price)
                 : Number(product.price);
 
-            // detect existing columns on orders table to avoid unknown column errors
             const [orderTableCols] = await connection.query("SHOW COLUMNS FROM orders");
-            const availableCols = new Set(orderTableCols.map(c => c.Field));
+            const availableCols = new Set(orderTableCols.map(c => (c.Field || c.field || "").toLowerCase()));
 
             const orderCols = ["user_id", "total_price", "status"];
             const orderPlaceholders = ["?", "?", "?"];
             const orderParams = [userId, directPrice * buyNowQuantity, "pending"];
-            if (address != null && availableCols.has("address")) {
+            if (address && availableCols.has("address")) {
                 orderCols.push("address");
                 orderPlaceholders.push("?");
                 orderParams.push(address);
             }
-            if (phone != null && availableCols.has("phone")) {
+            if (phone && availableCols.has("phone")) {
                 orderCols.push("phone");
                 orderPlaceholders.push("?");
                 orderParams.push(phone);
             }
-            if (note != null && availableCols.has("note")) {
+            if (note && availableCols.has("note")) {
                 orderCols.push("note");
                 orderPlaceholders.push("?");
                 orderParams.push(note);
+            }
+            if (recipient && availableCols.has("recipient")) {
+                orderCols.push("recipient");
+                orderPlaceholders.push("?");
+                orderParams.push(recipient);
             }
 
             const [orderResult] = await connection.query(
@@ -101,7 +105,7 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
             );
 
             await connection.commit();
-            return { id: orderId, status: "pending", total_price: directPrice * buyNowQuantity };
+            return getOrderDetail(orderId);
         }
 
         const finalCartItems = hasSelected
@@ -161,27 +165,31 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
             return sum + itemPrice * quantity;
         }, 0);
 
-        // detect existing columns on orders table to avoid unknown column errors
         const [orderTableCols] = await connection.query("SHOW COLUMNS FROM orders");
-        const availableCols = new Set(orderTableCols.map(c => c.Field));
+        const availableCols = new Set(orderTableCols.map(c => (c.Field || c.field || "").toLowerCase()));
 
         const orderCols = ["user_id", "total_price", "status"];
         const orderPlaceholders = ["?", "?", "?"];
         const orderParams = [userId, totalPrice, "pending"];
-        if (address != null && availableCols.has("address")) {
+        if (address && availableCols.has("address")) {
             orderCols.push("address");
             orderPlaceholders.push("?");
             orderParams.push(address);
         }
-        if (phone != null && availableCols.has("phone")) {
+        if (phone && availableCols.has("phone")) {
             orderCols.push("phone");
             orderPlaceholders.push("?");
             orderParams.push(phone);
         }
-        if (note != null && availableCols.has("note")) {
+        if (note && availableCols.has("note")) {
             orderCols.push("note");
             orderPlaceholders.push("?");
             orderParams.push(note);
+        }
+        if (recipient && availableCols.has("recipient")) {
+            orderCols.push("recipient");
+            orderPlaceholders.push("?");
+            orderParams.push(recipient);
         }
 
         const [orderResult] = await connection.query(
@@ -227,7 +235,7 @@ async function createOrderFromCart(userId, selectedProductIds = [], buyNowProduc
         }
 
         await connection.commit();
-        return { id: orderId, status: "pending", total_price: totalPrice };
+        return getOrderDetail(orderId);
     } catch (err) {
         await connection.rollback();
         throw err;
@@ -245,7 +253,25 @@ async function getMyOrders(userId) {
 }
 
 async function getOrderDetail(orderId) {
-    const [[order]] = await pool.query("SELECT * FROM orders WHERE id = ?", [orderId]);
+    const [orderTableCols] = await pool.query("SHOW COLUMNS FROM orders");
+    const availableCols = new Set(orderTableCols.map((c) => (c.Field || c.field || "").toLowerCase()));
+
+    const selectAddress = availableCols.has("address") ? "o.address AS address" : "NULL AS address";
+    const selectPhone = availableCols.has("phone") ? "o.phone" : "NULL";
+    const selectNote = availableCols.has("note") ? "o.note" : "NULL";
+    const selectRecipient = availableCols.has("recipient") ? "o.recipient" : "NULL";
+
+    const [[order]] = await pool.query(
+        `SELECT o.*, 
+                COALESCE(${selectRecipient}, u.username) AS recipient,
+                ${selectAddress} AS address, 
+                ${selectPhone} AS phone, 
+                ${selectNote} AS note 
+         FROM orders o 
+         LEFT JOIN users u ON u.id = o.user_id
+         WHERE o.id = ?`,
+        [orderId]
+    );
     if (!order) return null;
 
     const [items] = await pool.query(

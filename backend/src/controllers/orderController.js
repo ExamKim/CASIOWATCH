@@ -1,4 +1,4 @@
-﻿const orderService = require("../services/orderService");
+const orderService = require("../services/orderService");
 
 exports.createOrder = async (req, res, next) => {
     try {
@@ -12,6 +12,7 @@ exports.createOrder = async (req, res, next) => {
             address: req.body?.address,
             phone: req.body?.phone,
             note: req.body?.note,
+            recipient: req.body?.recipient || req.body?.fullName || req.body?.full_name || req.body?.recipient_name,
             buyNowQuantity,
         };
         const created = await orderService.createOrderFromCart(userId, selectedProductIds, buyNowProductId, shippingInfo);

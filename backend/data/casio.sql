@@ -34,45 +34,6 @@ CREATE TABLE IF NOT EXISTS products (
   INDEX idx_gender (gender)
 );
 
-DELETE FROM products;
-ALTER TABLE products AUTO_INCREMENT = 1;
-
-INSERT INTO products (name, category, gender, brand, price, sale_price, image_url, stock)
-VALUES
--- ... (dữ liệu mẫu giữ nguyên)
-('Casio G-Shock DW-5600WS-1DR', 'G-Shock', 'unisex', 'Casio', 2500000, 1875000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777116791/Casio_G-Shock_DW-5600WS-1DR.jpg', 10),
-('Casio G-SHOCK GST-B500D-1A1DR', 'G-Shock', 'men', 'Casio', 8500000, 7225000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-SHOCK_GST-B500D-1A1DR_lqcsvd.jpg', 8),
-('G-Shock GMA-S2100MD-4ADR', 'G-Shock', 'women', 'Casio', 4200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/G-Shock_GMA-S2100MD-4ADR_fa0uc5.jpg', 12),
-('Casio G-Shock GA-900A-1A9DR', 'G-Shock', 'men', 'Casio', 3900000, 3120000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-Shock_GA-900A-1A9DR_dbdxn0.jpg', 7),
-('G-Shock GMA-S2100MD-7ADR', 'G-Shock', 'women', 'Casio', 4100000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/G-Shock_GMA-S2100MD-7ADR_jgxxqv.jpg', 9),
-('Casio G-Shock GM-5600-1DR', 'G-Shock', 'men', 'Casio', 6000000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-Shock_GM-5600-1DR_zhs4nq.jpg', 6),
-('Casio G-Shock GA-2100-4ADR', 'G-Shock', 'unisex', 'Casio', 3500000, 2800000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-Shock_GA-2100-4ADR_vfhowy.jpg', 15),
-('Casio G-Shock GA-2000-2ADR', 'G-Shock', 'men', 'Casio', 3700000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117416/Casio_G-Shock_GA-2000-2ADR_se91aa.jpg', 10),
-('Casio G-Shock GA-100A-9AHDR', 'G-Shock', 'men', 'Casio', 3300000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117415/Casio_G-Shock_GA-100A-9AHDR_zqfp3n.jpg', 11),
-('Casio Edifice EQB-1200AT-1ADR', 'Edifice', 'men', 'Casio', 12500000, 10625000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117703/Casio_Edifice_EQB-1200AT-1ADR_zqrfgf.png', 5),
-('Casio Edifice EFV-650D-3AVUDF', 'Edifice', 'men', 'Casio', 3200000, 2560000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117702/Casio_Edifice_EFV-650D-3AVUDF_ekhobu.jpg', 10),
-('Casio Edifice EFV-100L-7AVUDF', 'Edifice', 'men', 'Casio', 2800000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117701/Casio_Edifice_EFV-100L-7AVUDF_lm02cs.jpg', 12),
-('Casio Edifice EFV-610SG-5AVUDF', 'Edifice', 'men', 'Casio', 4500000, 3825000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117701/Casio_Edifice_EFV-610SG-5AVUDF_bwjhug.jpg', 7),
-('Casio Edifice EFV-600D-2AVUDF', 'Edifice', 'men', 'Casio', 3500000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117701/Casio_Edifice_EFV-600D-2AVUDF_i3f1g4.jpg', 9),
-('Casio Edifice EFV-120DB-1AVUDF', 'Edifice', 'men', 'Casio', 3000000, 2250000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117700/Casio_Edifice_EFV-120DB-1AVUDF_haxxn9.jpg', 11),
-('Casio Edifice EFR-574D-2AVUDF', 'Edifice', 'men', 'Casio', 3700000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117700/Casio_Edifice_EFR-574D-2AVUDF_tzjdl6.jpg', 8),
-('Casio Edifice ECB-10DB-1BDF', 'Edifice', 'men', 'Casio', 6200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_ECB-10DB-1BDF_jhgycx.jpg', 6),
-('Casio Edifice EFB-710D-7AVUDF', 'Edifice', 'men', 'Casio', 5800000, 4640000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_EFB-710D-7AVUDF_onnsau.jpg', 5),
-('Casio Edifice ECB-10DC-1ADF', 'Edifice', 'men', 'Casio', 6400000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_ECB-10DC-1ADF_eldxii.jpg', 4),
-('Casio MTP-1375L-7AVDF', 'Classic', 'men', 'Casio', 1800000, 1440000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117969/Casio_MTP-1375L-7AVDF_wiwh8n.jpg', 15),
-('Casio MDV-10D-1A1VDF', 'Classic', 'men', 'Casio', 2200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117968/Casio_MDV-10D-1A1VDF_sx7vow.jpg', 12),
-('Casio MTP-VT01L-7B2UDF', 'Classic', 'men', 'Casio', 1200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777118824/Casio%20MTP-VT01L-7B2UDF.jpg', 15),
-('Casio MTP-VT01GL-1B2', 'Classic', 'men', 'Casio', 1300000, 975000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777118980/CASIO%20MTP-VT01GL-1B2.jpg', 12),
-('Casio LTP-VT01GL-9B', 'Classic', 'women', 'Casio', 1200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777118979/Casio%20LTP-VT01GL-9B_Seq1_kudlus.jpg', 14),
-('Casio Baby-G BSA-B100-4A1DR', 'G-SQUAD', 'women', 'Casio', 3500000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117874/Casio_G-SQUAD_BSA-B100-4A1DR_ydvx9w.jpg', 10),
-('Casio Baby-G BSA-B100MF-7ADR', 'Baby-G', 'women', 'Casio', 3200000, 2560000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117874/Casio_Baby-G_BSA-B100MF-7ADR_gsfbmc.jpg', 9),
-('Casio Baby-G BSA-B100MF-1ADR', 'Baby-G', 'women', 'Casio', 3200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117873/Casio_Baby-G_BSA-B100MF-1ADR_mhil1t.jpg', 9),
-('Casio Baby-G BSA-B100AC-2ADR', 'Baby-G', 'women', 'Casio', 3300000, 2640000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117873/Casio_Baby-G_BSA-B100AC-2ADR_pab4qz.jpg', 8),
-('Casio Baby-G BSA-B100-2ADR', 'Baby-G', 'women', 'Casio', 3100000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117872/Casio_Baby-G_BSA-B100-2ADR_j9g76u.jpg', 10),
-('Casio Baby-G BSA-B100-4A2D', 'Baby-G', 'women', 'Casio', 3100000, 2325000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117872/Casio_Baby-G_BSA-B100-4A2D_ojlye6.jpg', 10),
-('Casio Baby-G BSA-B100-1ADR', 'Baby-G', 'women', 'Casio', 3000000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117871/Casio_Baby-G_BSA-B100-1ADR_txlqyq.jpg', 11),
-('Casio Baby-G BGD-570THB-7DR', 'Baby-G', 'women', 'Casio', 2800000, 2240000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117871/Casio_Baby-G_BGD-570THB-7DR_zcl2ze.jpg', 7),
-('Casio Baby-G BGD-560THB-7DR', 'Baby-G', 'women', 'Casio', 2700000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117870/Casio_Baby-G_BGD-560THB-7DR_lrbdtr.jpg', 6);
 
 -- 3. Tạo bảng cart_items
 CREATE TABLE IF NOT EXISTS cart_items (

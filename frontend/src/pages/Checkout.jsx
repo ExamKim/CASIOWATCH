@@ -32,6 +32,7 @@ const Checkout = () => {
         phone: "",
         email: "",
         address: "",
+        note: "",
         paymentMethod: "qr",
     });
 
@@ -155,6 +156,7 @@ const Checkout = () => {
                 address: formData.address,
                 phone: formData.phone,
                 note: formData.note,
+                recipient_name: formData.fullName,
             };
 
             if (Number.isInteger(directBuyNowId) && directBuyNowId > 0) {
@@ -230,7 +232,11 @@ const Checkout = () => {
                             </label>
                             <label className="checkout-field checkout-field-full">
                                 <span>Địa chỉ giao hàng</span>
-                                <textarea name="address" rows="4" value={formData.address} onChange={handleChange} />
+                                <textarea name="address" rows="3" value={formData.address} onChange={handleChange} placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố" />
+                            </label>
+                            <label className="checkout-field checkout-field-full">
+                                <span>Ghi chú đơn hàng</span>
+                                <textarea name="note" rows="2" value={formData.note} onChange={handleChange} placeholder="Yêu cầu đặc biệt về giao hàng..." />
                             </label>
                         </div>
                     </section>

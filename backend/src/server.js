@@ -1,6 +1,6 @@
 require("dotenv").config();
 const app = require("./app");
-const { testDbConnection } = require("./config/db.js");
+const { testDbConnection, ensureOrderShippingColumns } = require("./config/db.js");
 
 // Kiem tra ket noi database    
 
@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 5000;
 (async () => {
     try {
         await testDbConnection();
+        await ensureOrderShippingColumns();
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
         });

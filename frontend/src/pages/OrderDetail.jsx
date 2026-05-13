@@ -72,8 +72,9 @@ export default function OrderDetail() {
                         <div className="order-shipping-info" style={{ marginTop: 24, padding: 20, backgroundColor: '#f9f9f9', borderRadius: 8 }}>
                             <h3 style={{ marginBottom: 12 }}>Thông tin giao hàng</h3>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
-                                <p><strong>Địa chỉ:</strong> {currentOrder.address || "Chưa cung cấp"}</p>
+                                <p><strong>Người nhận:</strong> {currentOrder.recipient || "Chưa cung cấp"}</p>
                                 <p><strong>Số điện thoại:</strong> {currentOrder.phone || "Chưa cung cấp"}</p>
+                                <p style={{ gridColumn: 'span 2' }}><strong>Địa chỉ:</strong> {currentOrder.address || "Chưa cung cấp"}</p>
                                 <p style={{ gridColumn: 'span 2' }}><strong>Ghi chú:</strong> {currentOrder.note || "Không có ghi chú"}</p>
                             </div>
                         </div>
