@@ -19,4 +19,28 @@ async function createUser({ username, email, passwordHash, role = "user", phone 
     return await findById(result.insertId);
 }
 
-module.exports = { findByEmail, findById, createUser };
+async function updateProfile(id, { username, phone, address }) {
+    const sets = [];
+    const params = [];
+
+    if (username !== undefined) {
+        sets.push("username = ?");
+        params.push(username);
+    }
+    if (phone !== undefined) {
+        sets.push("phone = ?");
+        params.push(phone);
+    }
+    if (address !== undefined) {
+        sets.push("address = ?");
+        params.push(address);
+    }
+
+    if (sets.length === 0) return await findById(id);
+
+    params.push(id);
+    await pool.query(`UPDATE users SET ${sets.join(", ")} WHERE id = ?`, params);
+    return await findById(id);
+}
+
+module.exports = { findByEmail, findById, createUser, updateProfile };

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { createOrderThunk } from "../store/ordersSlice";
+import { updateProfileThunk } from "../store/authSlice";
 import { fetchCartThunk } from "../store/cartSlice";
 import { addToast } from "../store/uiSlice";
 import { getProductImage } from "../utils/productImage";
@@ -35,6 +36,7 @@ const Checkout = () => {
         note: "",
         paymentMethod: "qr",
     });
+    const [saveToProfile, setSaveToProfile] = useState(false);
 
     useEffect(() => {
         dispatch(fetchCartThunk());
@@ -156,6 +158,8 @@ const Checkout = () => {
                 address: formData.address,
                 phone: formData.phone,
                 note: formData.note,
+                // include both keys to be compatible with backend variants
+                recipient: formData.fullName,
                 recipient_name: formData.fullName,
             };
 
@@ -164,6 +168,18 @@ const Checkout = () => {
                 createPayload.buyNowQuantity = buyNowProduct?.quantity || 1;
             } else if (selectedProductIds.length > 0) {
                 createPayload.selectedProductIds = selectedProductIds;
+            }
+
+            if (saveToProfile) {
+                try {
+                    await dispatch(updateProfileThunk({
+                        phone: formData.phone,
+                        address: formData.address,
+                    })).unwrap();
+                } catch (profileErr) {
+                    console.error("Failed to update profile:", profileErr);
+                    // We don't block order creation if profile update fails
+                }
             }
 
             const order = await dispatch(createOrderThunk(createPayload)).unwrap();
@@ -237,6 +253,15 @@ const Checkout = () => {
                             <label className="checkout-field checkout-field-full">
                                 <span>Ghi chú đơn hàng</span>
                                 <textarea name="note" rows="2" value={formData.note} onChange={handleChange} placeholder="Yêu cầu đặc biệt về giao hàng..." />
+                            </label>
+                            
+                            <label className="checkout-checkbox-field">
+                                <input 
+                                    type="checkbox" 
+                                    checked={saveToProfile} 
+                                    onChange={(e) => setSaveToProfile(e.target.checked)} 
+                                />
+                                <span>Lưu làm địa chỉ và số điện thoại mặc định cho các lần mua sau</span>
                             </label>
                         </div>
                     </section>

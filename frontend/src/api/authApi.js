@@ -14,4 +14,9 @@ export const authApi = {
     me() {
         return axiosClient.get("/users/me").then((res) => res.data);
     },
+
+    updateProfile(payload) {
+        // payload: { username, phone, address }
+        return axiosClient.put("/users/profile", payload).then((res) => res.data);
+    },
 };

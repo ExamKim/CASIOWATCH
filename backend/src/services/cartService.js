@@ -69,18 +69,41 @@ async function getCartByUserId(userId) {
 
 // Thay thế hàm updateCart cũ bằng updateCartItem (theo từng sản phẩm)
 async function updateCartItem(userId, productId, quantity) {
-    const [[product]] = await pool.query("SELECT name, stock FROM products WHERE id = ?", [productId]);
-    const requestedQty = Number(quantity);
+    const connection = await pool.getConnection();
+    try {
+        await connection.beginTransaction();
 
-    if (product && product.stock < requestedQty) {
-        throw new Error(`Không thể cập nhật: Sản phẩm "${product.name}" chỉ còn ${product.stock} chiếc`);
+        // 1. Khóa hàng sản phẩm để lấy tồn kho mới nhất
+        const [[product]] = await connection.query(
+            "SELECT name, stock, status FROM products WHERE id = ? FOR UPDATE",
+            [productId]
+        );
+
+        if (!product || product.status === 'deleted') {
+            throw new Error("Sản phẩm không tồn tại hoặc đã bị ngừng kinh doanh");
+        }
+
+        const requestedQty = Number(quantity);
+
+        // 2. Kiểm tra tồn kho
+        if (product.stock < requestedQty) {
+            throw new Error(`Sản phẩm "${product.name}" chỉ còn ${product.stock} chiếc, không đủ ${requestedQty} chiếc`);
+        }
+
+        // 3. Cập nhật
+        await connection.query(
+            "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?",
+            [requestedQty, userId, productId]
+        );
+
+        await connection.commit();
+        return { success: true };
+    } catch (err) {
+        await connection.rollback();
+        throw err;
+    } finally {
+        connection.release();
     }
-
-    await pool.query(
-        "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?",
-        [requestedQty, userId, productId]
-    );
-    return { success: true };
 }
 
 // Thêm hàm removeFromCart

@@ -48,6 +48,19 @@ export const meThunk = createAsyncThunk(
     }
 );
 
+// UPDATE PROFILE
+export const updateProfileThunk = createAsyncThunk(
+    "auth/updateProfile",
+    async (payload, { rejectWithValue }) => {
+        try {
+            const data = await authApi.updateProfile(payload); // updated user object
+            return data;
+        } catch (err) {
+            return rejectWithValue(normalizeApiError(err, "Update profile failed"));
+        }
+    }
+);
+
 const authSlice = createSlice({
     name: "auth",
     initialState,
@@ -109,6 +122,20 @@ const authSlice = createSlice({
             .addCase(meThunk.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload || "Fetch user failed";
+            })
+
+            // update profile
+            .addCase(updateProfileThunk.pending, (state) => {
+                state.status = "loading";
+                state.error = null;
+            })
+            .addCase(updateProfileThunk.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                state.user = action.payload;
+            })
+            .addCase(updateProfileThunk.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload || "Update profile failed";
             });
     },
 });

@@ -253,21 +253,14 @@ async function getMyOrders(userId) {
 }
 
 async function getOrderDetail(orderId) {
-    const [orderTableCols] = await pool.query("SHOW COLUMNS FROM orders");
-    const availableCols = new Set(orderTableCols.map((c) => (c.Field || c.field || "").toLowerCase()));
-
-    const selectAddress = availableCols.has("address") ? "o.address AS address" : "NULL AS address";
-    const selectPhone = availableCols.has("phone") ? "o.phone" : "NULL";
-    const selectNote = availableCols.has("note") ? "o.note" : "NULL";
-    const selectRecipient = availableCols.has("recipient") ? "o.recipient" : "NULL";
-
+    // Columns `recipient`, `address`, `phone`, `note` are ensured to exist at server start
     const [[order]] = await pool.query(
         `SELECT o.*, 
-                COALESCE(${selectRecipient}, u.username) AS recipient,
-                ${selectAddress} AS address, 
-                ${selectPhone} AS phone, 
-                ${selectNote} AS note 
-         FROM orders o 
+                COALESCE(o.recipient, u.username) AS recipient,
+                o.address AS address,
+                o.phone AS phone,
+                o.note AS note
+         FROM orders o
          LEFT JOIN users u ON u.id = o.user_id
          WHERE o.id = ?`,
         [orderId]

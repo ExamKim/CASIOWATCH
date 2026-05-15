@@ -17,4 +17,16 @@ router.get("/me", authMiddleware, async (req, res, next) => {
     }
 });
 
+router.put("/profile", authMiddleware, async (req, res, next) => {
+    try {
+        const { username, phone, address } = req.body;
+        const updated = await userService.updateProfile(req.user.id, { username, phone, address });
+        const safeUser = { ...updated };
+        delete safeUser.password_hash;
+        res.json(safeUser);
+    } catch (err) {
+        next(err);
+    }
+});
+
 module.exports = router;
