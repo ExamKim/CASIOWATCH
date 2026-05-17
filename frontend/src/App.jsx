@@ -23,6 +23,7 @@ import OrderSuccess from './pages/OrderSuccess';
 import GShock from './pages/GShock';
 import Edifice from './pages/Edifice';
 import BabyG from './pages/BabyG';
+import Profile from './pages/Profile';
 
 import './App.css';
 
@@ -55,6 +56,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
           <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
           <Route path="/orders/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />

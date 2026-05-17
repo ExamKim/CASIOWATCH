@@ -30,7 +30,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
                 disabled={page <= 1}
                 onClick={() => onPageChange(page - 1)}
             >
-                Truoc
+                Trước
             </button>
 
             {pages.map((item, idx) => {

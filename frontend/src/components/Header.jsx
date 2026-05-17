@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../store/authSlice';
@@ -235,9 +235,9 @@ const Header = () => {
             </Link>
 
             {token && user ? (
-              <button onClick={handleLogout} className="icon-btn" aria-label="Logout">
-                <HeaderIcon name="logout" />
-              </button>
+              <Link to="/profile" className="icon-btn" aria-label="Profile">
+                <HeaderIcon name="user" />
+              </Link>
             ) : (
               <button
                 type="button"

@@ -19,4 +19,9 @@ export const authApi = {
         // payload: { username, phone, address }
         return axiosClient.put("/users/profile", payload).then((res) => res.data);
     },
+
+    changePassword(payload) {
+        // payload: { currentPassword, newPassword }
+        return axiosClient.put("/users/change-password", payload).then((res) => res.data);
+    },
 };

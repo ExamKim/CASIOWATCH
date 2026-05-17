@@ -43,4 +43,8 @@ async function updateProfile(id, { username, phone, address }) {
     return await findById(id);
 }
 
-module.exports = { findByEmail, findById, createUser, updateProfile };
+async function updatePassword(id, passwordHash) {
+    await pool.query("UPDATE users SET password_hash = ? WHERE id = ?", [passwordHash, id]);
+}
+
+module.exports = { findByEmail, findById, createUser, updateProfile, updatePassword };

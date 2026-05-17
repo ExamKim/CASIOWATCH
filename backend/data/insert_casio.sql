@@ -23,7 +23,7 @@ VALUES
     ('Casio Edifice EFV-600D-2AVUDF', 'Edifice', 'men', 'Casio', 3500000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117701/Casio_Edifice_EFV-600D-2AVUDF_i3f1g4.jpg', 9),
     ('Casio Edifice EFV-120DB-1AVUDF', 'Edifice', 'men', 'Casio', 3000000, 2250000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117700/Casio_Edifice_EFV-120DB-1AVUDF_haxxn9.jpg', 11),
     ('Casio Edifice EFR-574D-2AVUDF', 'Edifice', 'men', 'Casio', 3700000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117700/Casio_Edifice_EFR-574D-2AVUDF_tzjdl6.jpg', 8),
-    ('Casio Edifice ECB-10DB-1BDF', 'Edifice', 'men', 'Casio', 6200000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_ECB-10DB-1BDF_jhgycx.jpg', 6),
+    ('Casio Edifice ECB-10DB-1BDF', 'Edifice', 'men', 'Casio', 2000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_ECB-10DB-1BDF_jhgycx.jpg', 6),
     ('Casio Edifice EFB-710D-7AVUDF', 'Edifice', 'men', 'Casio', 5800000, 4640000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_EFB-710D-7AVUDF_onnsau.jpg', 5),
     ('Casio Edifice ECB-10DC-1ADF', 'Edifice', 'men', 'Casio', 6400000, NULL, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117699/Casio_Edifice_ECB-10DC-1ADF_eldxii.jpg', 4),
     ('Casio MTP-1375L-7AVDF', 'Classic', 'men', 'Casio', 1800000, 1440000, 'https://res.cloudinary.com/dba2jwxfs/image/upload/v1777117969/Casio_MTP-1375L-7AVDF_wiwh8n.jpg', 15),
